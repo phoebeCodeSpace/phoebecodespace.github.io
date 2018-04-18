@@ -1,0 +1,341 @@
+<!DOCTYPE html><html lang="zh-Hans"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="description" content="typescript入门指南"><meta name="keywords" content="typescript"><meta name="author" content="phoebe,undefined"><meta name="copyright" content="phoebe"><title>typescript入门指南 | phoebe's blog</title><link rel="shortcut icon" href="https://www.tslang.cn/assets/images/icons/apple-touch-icon-57x57.png"><link rel="stylesheet" href="https://cdn.bootcss.com/reveal.js/3.6.0/css/reveal.min.css"><link rel="stylesheet" href="https://cdn.bootcss.com/reveal.js/3.6.0/css/theme/night.min.css"><link rel="stylesheet" href="https://cdn.bootcss.com/reveal.js/3.6.0/lib/css/zenburn.min.css"><link rel="stylesheet" href="/css/prism.css" type="text/css"></head><body><div class="reveal"><div class="slides"><section data-markdown data-separator="===" data-separator-vertical="==" data-charset="utf-8"><script type="text/template">
+## typescript入门指南
+
+- 了解typescript
+- typescript快速开始
+- typescript实践
+
+===
+<!-- .slide: data-background="#337ab7" -->
+
+## 了解typescript
+
+- 什么是typescript
+- 为什么用typescript
+- 社区发展趋势
+
+==
+<!-- .slide: data-background="#337ab7" -->
+
+### 什么是typescript
+
+![typescript](https://user-gold-cdn.xitu.io/2017/9/22/8f164338a7ef32ecf35c8acb246f0adc?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+`TypeScript = Type + Script（标准JS）`
+
+==
+<!-- .slide: data-background="#337ab7" -->
+
+### 为什么用typescript
+
+- 质量： 静态类型，智能感知bug，提升整体开发质量
+- 效率：智能提示，利于代码可读性，提升整体开发效率
+
+==
+<!-- .slide: data-background="#337ab7" -->
+
+### 社区发展趋势
+
+2017最被喜爱的编程语言
+
+![2017-technology-most-loved-dreaded-and-wanted-languages](/assets/2017-technology-most-loved-dreaded-and-wanted-languages.png)
+
+==
+<!-- .slide: data-background="#337ab7" -->
+google 进5年搜索趋势
+
+![typescript-trend](/assets/typescript-trend.png)
+
+===
+<!-- .slide: data-background="#FFA700" -->
+
+## typescript快速开始
+
+- 安装与更新
+- 基础知识和核心概念
+
+==
+<!-- .slide: data-background="#FFA700" -->
+
+### 安装与更新
+
+``` bash
+# 安装
+npm install -g typescript
+
+# 编译
+tsc hello.ts
+```
+
+==
+
+### 基础知识和核心概念
+
+<!-- .slide: data-background="#FFA700" -->
+
+1. 基础类型
+2. 接口
+4. 装饰器
+
+==
+<!-- .slide: data-background="#FFA700" -->
+
+#### 基础类型
+
+``` ts
+let userName: string = "silkshadow"
+
+let birthYear: number = 1992
+
+let married: boolean = false
+
+let hobby1 : string[] = ["running","yoga","cooking"]
+let hobby2 : Array<string> = ["running", "yoga", "cooking"]
+
+let tuple : [number,string] = [1,'2']
+
+enum Fruits {
+  Apple,
+  Banana,
+  Pear,
+  Peach = 5
+}
+let fruit:string = Fruits[2]          //Pear
+let banana: Fruits = Fruits.Banana    // 1
+let peach: Fruits = Fruits.Peach      // 5
+
+let notSure:any = null
+notSure = false;
+
+let list: any[] = [1, true, "free"];
+list[1] = 100;
+
+function warning():void{
+  alert('warning')
+}
+
+function getUserName(name:string) :string{
+  return `My name is ${name}`
+}
+
+let u: undefined = undefined;
+let n: null = null;
+
+function error(message: string): never { 
+  throw new Error(message);
+}
+
+```
+
+==
+<!-- .slide: data-background="#FFA700" -->
+
+#### 接口
+
+``` ts
+enum Gender {
+  Male = 1,
+  Female = 2
+}
+interface Person {
+  name: string,
+  age: number,
+  readonly gender: Gender,
+  birthDay?: Date,
+  [propName: string]: any
+}
+
+let zhangsan: Person = {
+  name : 'zhangsan',
+  age: 25,
+  gender: Gender.Male,
+  married : false
+}
+```
+==
+<!-- .slide: data-background="#FFA700" -->
+
+#### 装饰器
+
+``` ts
+function addAge(constructor: Function) {
+  constructor.prototype.age = 18;
+}
+function method(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  console.log(target);
+  console.log("prop " + propertyKey);
+  console.log("desc " + JSON.stringify(descriptor) + "\n\n");
+};
+
+@addAge
+class HelloFn {
+  name: string;
+  age: number;
+  constructor() {
+    console.log('hello');
+    this.name = 'yugo';
+  }
+
+  @method
+  hello() {
+    return 'instance method';
+  }
+
+  @method
+  static shello() {
+    return 'static method';
+  }
+}
+```
+
+===
+<!-- .slide: data-background="#fb7444" -->
+
+## typescript实践
+
+> <small>以下教程，面向有react、vue基础的同学~~~</small>
+
+- typescript + react
+- typescript + vue
+
+===
+
+<!-- .slide: data-background="#fb7444" -->
+
+### typescript + react
+
+- [React typings](https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react)
+- [TypeScript-React-Starter](https://github.com/Microsoft/TypeScript-React-Starter)
+
+``` jsx
+import PropTypes from 'prop-types';
+class App extends React.PureComponent {
+  state = {
+    aState: '',
+    bState: '',
+  };
+}
+
+App.propTypes = {
+  aProps: PropTypes.string.isRequired,
+  bProps: PropTypes.string.isRequired,
+};
+```
+
+==
+<!-- .slide: data-background="#fb7444" -->
+
+``` ts
+interface IProps {
+  aProps: string;
+  bProps: string;
+}
+interface IState {
+  aState: string;
+  bState: string;
+}
+
+class App extends React.PureComponent<IProps, IState> {
+  state = {
+    aState: '',
+    bState: '',
+  };
+}
+```
+
+===
+<!-- .slide: data-background="#fb7444" -->
+
+### typescript + vue
+
+- [TypeScript-Vue-Starter](https://github.com/Microsoft/TypeScript-Vue-Starter)
+- [vue-property-decorator](https://github.com/kaorun343/vue-property-decorator)
+
+``` js
+export const MyComponent = Vue.extend({
+  name: 'MyComponent',
+  props: {
+    propA: Number,
+    propB: {
+      type: String,
+      default: 'default value'
+    },
+    propC: [String, Boolean],
+  },
+  data () {
+    return {
+      foo: 'foo',
+      baz: 'bar'
+    }
+  },
+  methods: {
+    addToCount(n){
+      this.count += n
+      this.$emit("add-to-count", n)
+    },
+    resetCount(){
+      this.count = 0
+      this.$emit("reset")
+    },
+  },
+  watch: {
+    child(val,oldVal){
+
+    }
+  }
+})
+```
+
+==
+<!-- .slide: data-background="#fb7444" -->
+
+``` ts
+import { Component, Emit, Prop, Vue, Watch } from 'vue-property-decorator'
+
+@Component
+export class MyComponent extends Vue {
+  @Emit()
+  addToCount(n: number){ this.count += n }
+
+  @Emit('reset')
+  resetCount(){ this.count = 0 }
+
+  @Prop()
+  propA: number
+
+  @Prop({ default: 'default value' })
+  propB: string
+
+  @Prop([String, Boolean])
+  propC: string | boolean
+
+  foo: string = 'foo'
+  baz: string = 'bar'
+
+  @Watch('child')
+  onChildChanged(val: string, oldVal: string) { }
+}
+```</script></section></div></div><script src="/js/third-party/reveal/head.min.js"></script><script src="/js/third-party/reveal/reveal.min.js"></script><script>Reveal.initialize({
+  mouseWheel: false,
+  transition: 'slide',
+  transitionSpeed: 'default',
+  parallaxBackgroundImage: '',
+  parallaxBackgroundSize: '',
+  parallaxBackgroundHorizontal: '',
+  parallaxBackgroundVertical: '',
+  markdown: {
+    smartypants: true
+  },
+  dependencies: [
+    { src: '/js/third-party/reveal/marked.min.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+    { src: '/js/third-party/reveal/markdown.min.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+    // Syntax highlight for <code> elements
+    { src: '/js/third-party/reveal/highlight.min.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+    // Zoom in and out with Alt+click
+    { src: '/js/third-party/reveal/zoom.min.js', async: true },
+    // Speaker notes
+    { src: '/js/third-party/reveal/notes.min.js', async: true },
+    // MathJax
+    { src: '/js/third-party/reveal/math.min.js', async: true }
+  ]
+});</script></body></html>
