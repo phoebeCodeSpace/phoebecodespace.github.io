@@ -130,7 +130,7 @@ var ParticleWave = function () {
     var midY = height / 2;
     var midX = width / 2;
 
-    var spreadX = 5;
+    var spreadX = 8;
     var spreadZ = 0.0;
 
     var modZ = 0.0;
@@ -147,14 +147,14 @@ var ParticleWave = function () {
     engine.fillStyle = particleFillStyle;
     // engine.beginPath();
 
-    var waveControl = 10;
+    var waveControl = 8;
 
     for (var i = 0, xIndex, zIndex; i < particle.length; i += 2) {
 
       xIndex = i;
       zIndex = i + 1;
 
-      particle[zIndex] += 0.003;
+      particle[zIndex] += 0.002;
 
       if (particle[zIndex] > 1) {
         particle[zIndex] = 0;
