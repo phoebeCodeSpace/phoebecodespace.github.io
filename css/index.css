@@ -410,7 +410,6 @@ footer {
 #nav {
   position: relative;
   margin-bottom: 1rem;
-  background-color: #ff2072;
   background-attachment: fixed;
   background-position: center;
   -webkit-background-size: cover;
@@ -428,7 +427,7 @@ footer {
 }
 #site-title,
 #site-sub-title {
-  color: #eee;
+  color: #ff2072;
   text-align: center;
   text-shadow: 0.1rem 0.1rem 0.2rem rgba(0,0,0,0.15);
   line-height: 1.5;
@@ -447,10 +446,13 @@ footer {
 }
 #site-social-icons .social-icon {
   margin: 0 0.5rem;
-  color: #eee;
+  color: #ff2072;
   text-shadow: 0.1rem 0.1rem 0.2rem rgba(0,0,0,0.15);
   font-size: 1.4rem;
   cursor: pointer;
+}
+#site-social-icons .social-icon .fa {
+  color: #ff2072;
 }
 #site-social-icons .social-icon:hover {
   color: #fff;
@@ -1025,6 +1027,9 @@ footer {
 }
 #post {
   overflow: hidden;
+  background-color: #202228;
+  padding: 20px;
+  margin-bottom: 20px;
 }
 #post #post-meta {
   color: #ff2072;
@@ -1038,7 +1043,7 @@ footer {
 #top-container {
   position: relative;
   margin-bottom: 1rem;
-  background-color: #ff2072;
+  background-color: rgba(255,32,114,0.8);
   background-attachment: fixed;
   background-position: center;
   -webkit-background-size: cover;
@@ -1122,6 +1127,7 @@ footer {
 .layout {
   margin: 0 auto;
   width: 700px;
+  padding: 20px;
   opacity: 0;
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
   filter: alpha(opacity=0);
@@ -1639,4 +1645,9 @@ img:hover {
   width: 0;
   height: 1px;
   background: #ff2072;
+}
+#canvas {
+  position: fixed;
+  left: 0;
+  top: 0;
 }
