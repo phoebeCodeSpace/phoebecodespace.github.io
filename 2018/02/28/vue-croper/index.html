@@ -1,0 +1,125 @@
+<!DOCTYPE html><html lang="zh-Hans"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="description" content="vue 实现剪裁图片并上传服务器"><meta name="keywords" content="vue"><meta name="author" content="phoebe,undefined"><meta name="copyright" content="phoebe"><title>vue 实现剪裁图片并上传服务器 | phoebe's blog</title><link rel="shortcut icon" href="/favicon.ico"><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.3"><link rel="dns-prefetch" href="https://cdn.staticfile.org"><link rel="dns-prefetch" href="https://cdn.bootcss.com"><link rel="dns-prefetch" href="https://creativecommons.org"><link rel="dns-prefetch" href="https://unpkg.com"><link rel="stylesheet" type="text/css" href="https://unpkg.com/gitment@latest/style/default.css"><script src="https://unpkg.com/gitment@latest/dist/gitment.browser.js"></script><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  localSearch: undefined
+} </script><link rel="stylesheet" href="/css/prism.css" type="text/css"></head><body><canvas id="canvas"></canvas><i class="fa fa-arrow-right" id="toggle-sidebar" aria-hidden="true"></i><div id="sidebar"><div class="toggle-sidebar-info text-center"><span data-toggle="切换文章详情">切换站点概览</span><hr></div><div class="sidebar-toc"><div class="sidebar-toc__title">目录</div><div class="sidebar-toc__progress"><span class="progress-notice">你已经读了</span><span class="progress-num">0</span><span class="progress-percentage">%</span><div class="sidebar-toc__progress-bar"></div></div><div class="sidebar-toc__content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#效果图"><span class="toc-number">1.</span> <span class="toc-text">效果图</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#需求"><span class="toc-number">2.</span> <span class="toc-text">需求</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实现步骤"><span class="toc-number">3.</span> <span class="toc-text">实现步骤</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-图片选择与读取"><span class="toc-number">3.1.</span> <span class="toc-text">1. 图片选择与读取</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-在canvas中展示图片"><span class="toc-number">3.2.</span> <span class="toc-text">2. 在canvas中展示图片</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-移动裁剪框"><span class="toc-number">3.3.</span> <span class="toc-text">3. 移动裁剪框</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-上传图片至服务器"><span class="toc-number">3.4.</span> <span class="toc-text">4. 上传图片至服务器</span></a></li></ol></li></ol></div></div><div class="author-info hide"><div class="author-info__avatar text-center"><img src="/img/avatar.png"></div><div class="author-info__name text-center">phoebe</div><div class="author-info__description text-center"></div><hr><div class="author-info-articles"><a class="author-info-articles__archives article-meta" href="/archives"><span class="pull-left">文章</span><span class="pull-right">4</span></a><a class="author-info-articles__tags article-meta" href="/tags"><span class="pull-left">标签</span><span class="pull-right">3</span></a><a class="author-info-articles__categories article-meta" href="/categories"><span class="pull-left">分类</span><span class="pull-right">1</span></a></div></div></div><div id="content-outer"><div class="plain" id="top-container"><div id="page-header"><span class="pull-left"> <a id="site-name" href="/">phoebe's blog</a></span><i class="fa fa-bars toggle-menu pull-right" aria-hidden="true"></i><span class="pull-right menus"><a class="site-page" href="/">首页</a><a class="site-page" href="/archives">归档</a><a class="site-page" href="/tags">标签</a><a class="site-page" href="/categories">目录</a><a class="site-page" href="/gallery">相册</a></span></div></div><div class="layout" id="content-inner"><article id="post"><div class="plain" id="post-title">vue 实现剪裁图片并上传服务器</div><div id="post-meta"><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2018-02-28</time></div><div id="post-content"><h2 id="效果图"><a href="#效果图" class="headerlink" title="效果图"></a>效果图</h2><p>预览链接 <a href="https://phoebecodespace.github.io/emic-element/#/cropper">点击预览</a><br><img src="./cropper/result.gif" alt="cropper"></p>
+<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><ul>
+<li style="list-style: none"><input type="checkbox" checked> 预览：根据选择图像大小自适应填充左侧裁剪区域</li>
+<li style="list-style: none"><input type="checkbox" checked> 裁剪：移动裁剪框右侧预览区域可实时预览</li>
+<li style="list-style: none"><input type="checkbox" checked> 上传&amp;清空：点击确认上传裁剪图片，点击取消按钮清空图像</li>
+<li style="list-style: none"><input type="checkbox"> 裁剪框可调节大小</li>
+</ul>
+<h2 id="实现步骤"><a href="#实现步骤" class="headerlink" title="实现步骤"></a>实现步骤</h2><blockquote>
+<p>methods:funName() -  对应源码中methods中的funName方法<br>data:dataName     -  对应源码中data中的dataName数据</p>
+</blockquote>
+<h3 id="1-图片选择与读取"><a href="#1-图片选择与读取" class="headerlink" title="1. 图片选择与读取"></a>1. 图片选择与读取</h3><ul>
+<li><strong>选择图片</strong>：(methods:selectPic)<br>  使用<code>input[type=&quot;file&quot;]</code>弹出选择图片框，js 主动触发点击事件;</li>
+<li><strong>读取图片</strong>： (methods:readImage)<br>  创建图片对象，使用<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/URL/createObjectURL" target="_blank" rel="noopener">createObjectURL</a>显示图片。<br>  <code>objectURL = URL.createObjectURL(blob)</code>;</li>
+</ul>
+<h3 id="2-在canvas中展示图片"><a href="#2-在canvas中展示图片" class="headerlink" title="2. 在canvas中展示图片"></a>2. 在canvas中展示图片</h3><p><strong>需要掌握的 canvas 相关知识</strong>:</p>
+<ol>
+<li>清空画布 <code>ctx.clearRect(x,y,width,height)</code>;</li>
+<li>填充矩形 <code>ctx.fillRect(x,y,width,height)</code>;</li>
+<li>绘制圆弧 <code>ctx.arc(x,y,r,startAngle,endAngle,counterclockwise)</code>;<br>绘制矩形 <code>ctx.rect(x,y,width,height);</code></li>
+<li>绘制图像 <a href="https://developer.mozilla.org/zh-CN/docs/Web/API/CanvasRenderingContext2D/drawImage" target="_blank" rel="noopener">drawImage</a><br> <img src="./cropper/Canvas_drawimage.jpg" alt="drawImage"><pre class=" language-bash"><code class="language-bash">     <span class="token comment" spellcheck="true"># 语法</span>
+     ctx.drawImage<span class="token punctuation">(</span>image, dx, dy<span class="token punctuation">)</span><span class="token punctuation">;</span>
+     ctx.drawImage<span class="token punctuation">(</span>image, dx, dy, dWidth, dHeight<span class="token punctuation">)</span><span class="token punctuation">;</span>
+     ctx.drawImage<span class="token punctuation">(</span>image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight<span class="token punctuation">)</span><span class="token punctuation">;</span>
+     <span class="token comment" spellcheck="true"># 参数</span>
+     image                <span class="token comment" spellcheck="true"># 绘制的元素（可以为HTMLImageElement，HTMLVideoElement，或者 HTMLCanvasElement。）</span>
+     dx,dy                <span class="token comment" spellcheck="true"># 目标画布(destination canvas)左上角的坐标</span>
+     dWidth,dHeight       <span class="token comment" spellcheck="true"># 目标画布(destination canvas)上绘制图像宽高</span>
+     sx,sy                <span class="token comment" spellcheck="true"># 源画布(source canvase)左上角的坐标</span>
+     sWidth,sHeight       <span class="token comment" spellcheck="true"># 源画布(source canvase)选择的图像宽高</span>
+</code></pre>
+</li>
+<li>剪裁图片 <code>ctx.clip()</code>;</li>
+</ol>
+<p><strong>具体步骤</strong>:</p>
+<ul>
+<li><strong>计算canvas宽高</strong>：(methods:calcCropperSize)<br>  根据图片大小，计算canvas宽高（data:cropperCanvasSize），以致图片能够在裁剪区域自适应展示，并确定裁剪的左上角位置（data:cropperLocation）。</li>
+<li><strong>绘制左侧裁剪区域图像</strong>：(methods:renderCropperImg)</li>
+</ul>
+<blockquote>
+<p>裁剪区域vue data示意图：<br><img src="./cropper/cropper-vue-data.png" alt="vue data"></p>
+</blockquote>
+<ul>
+<li><strong>绘制右侧预览图片</strong>：(methods:renderPreviewImg)</li>
+</ul>
+<h3 id="3-移动裁剪框"><a href="#3-移动裁剪框" class="headerlink" title="3. 移动裁剪框"></a>3. 移动裁剪框</h3><p><strong>知识点</strong>:<br>onmousedown、onmousemove、onmouseup</p>
+<p><strong>具体实现</strong>:</p>
+<blockquote>
+<p>methods:drag()</p>
+</blockquote>
+<p>记录鼠标坐标，鼠标移动根据偏移量计算圆心位置。</p>
+<pre class=" language-js"><code class="language-js">      canvas<span class="token punctuation">.</span>onmousedown <span class="token operator">=</span> e <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+        <span class="token keyword">let</span> <span class="token punctuation">[</span>lastX<span class="token punctuation">,</span> lastY<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">[</span>e<span class="token punctuation">.</span>offsetX<span class="token punctuation">,</span> e<span class="token punctuation">.</span>offsetY<span class="token punctuation">]</span><span class="token punctuation">;</span>
+        self<span class="token punctuation">.</span>movement <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+        canvas<span class="token punctuation">.</span>onmousemove <span class="token operator">=</span> e <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+          self<span class="token punctuation">.</span>circleCenter <span class="token operator">=</span> <span class="token punctuation">{</span>
+            X<span class="token punctuation">:</span>
+              self<span class="token punctuation">.</span>cropperCanvasSize<span class="token punctuation">.</span>width <span class="token operator">></span> <span class="token number">2</span> <span class="token operator">*</span> self<span class="token punctuation">.</span>slectRadius
+                <span class="token operator">?</span> self<span class="token punctuation">.</span>circleCenter<span class="token punctuation">.</span>X <span class="token operator">+</span> <span class="token punctuation">(</span>e<span class="token punctuation">.</span>offsetX <span class="token operator">-</span> lastX<span class="token punctuation">)</span>
+                <span class="token punctuation">:</span> self<span class="token punctuation">.</span>cropperCanvasSize<span class="token punctuation">.</span>width <span class="token operator">/</span> <span class="token number">2</span><span class="token punctuation">,</span>
+            Y<span class="token punctuation">:</span>
+              self<span class="token punctuation">.</span>cropperCanvasSize<span class="token punctuation">.</span>height <span class="token operator">></span> <span class="token number">2</span> <span class="token operator">*</span> self<span class="token punctuation">.</span>slectRadius
+                <span class="token operator">?</span> self<span class="token punctuation">.</span>circleCenter<span class="token punctuation">.</span>Y <span class="token operator">+</span> <span class="token punctuation">(</span>e<span class="token punctuation">.</span>offsetY <span class="token operator">-</span> lastY<span class="token punctuation">)</span>
+                <span class="token punctuation">:</span> self<span class="token punctuation">.</span>cropperCanvasSize<span class="token punctuation">.</span>height <span class="token operator">/</span> <span class="token number">2</span>
+          <span class="token punctuation">}</span><span class="token punctuation">;</span>
+          self<span class="token punctuation">.</span><span class="token function">renderCropperImg</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token punctuation">[</span>lastX<span class="token punctuation">,</span> lastY<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">[</span>e<span class="token punctuation">.</span>offsetX<span class="token punctuation">,</span> e<span class="token punctuation">.</span>offsetY<span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span><span class="token punctuation">;</span>
+        canvas<span class="token punctuation">.</span>onmouseup <span class="token operator">=</span> e <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+          self<span class="token punctuation">.</span>movement <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+          canvas<span class="token punctuation">.</span>onmousemove <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+          canvas<span class="token punctuation">.</span>onmouseup <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="4-上传图片至服务器"><a href="#4-上传图片至服务器" class="headerlink" title="4. 上传图片至服务器"></a>4. 上传图片至服务器</h3><p><strong>知识点</strong>:</p>
+<ul>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/API/FormData/Using_FormData_Objects" target="_blank" rel="noopener">FormData 对象的使用</a></li>
+<li><a href="https://developer.mozilla.org/zh-CN/docs/Web/API/HTMLCanvasElement/toBlob" target="_blank" rel="noopener">canvas.toBlob()</a> ;</li>
+<li><a href="https://stackoverflow.com/questions/4998908/convert-data-uri-to-file-then-append-to-formdata/11954337#11954337" target="_blank" rel="noopener">Convert Data URI to File then append to FormData</a></li>
+</ul>
+<p><strong>具体实现</strong>:</p>
+<blockquote>
+<p>methods:upload()</p>
+</blockquote>
+<pre class=" language-js"><code class="language-js">      <span class="token keyword">this</span><span class="token punctuation">.</span>$refs<span class="token punctuation">.</span>preview<span class="token punctuation">.</span><span class="token function">toBlob</span><span class="token punctuation">(</span><span class="token punctuation">(</span>blob<span class="token punctuation">)</span><span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+        <span class="token keyword">const</span> url <span class="token operator">=</span> URL<span class="token punctuation">.</span><span class="token function">createObjectURL</span><span class="token punctuation">(</span>blob<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">const</span> formData <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">FormData</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        formData<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>uploadProps<span class="token punctuation">.</span>name<span class="token punctuation">,</span> blob<span class="token punctuation">,</span> <span class="token template-string"><span class="token string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>Date<span class="token punctuation">.</span><span class="token function">now</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">.png`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>data<span class="token punctuation">)</span><span class="token punctuation">{</span>
+            Object<span class="token punctuation">.</span><span class="token function">keys</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>uploadProps<span class="token punctuation">.</span>data<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span>key <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+                formData<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>uploadProps<span class="token punctuation">.</span>data<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">const</span> request <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">XMLHttpRequest</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        request<span class="token punctuation">.</span><span class="token function">open</span><span class="token punctuation">(</span><span class="token string">"POST"</span><span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>uploadProps<span class="token punctuation">.</span>action<span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        request<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span>formData<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        request<span class="token punctuation">.</span>onreadystatechange <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+          <span class="token keyword">if</span> <span class="token punctuation">(</span>request<span class="token punctuation">.</span>readyState <span class="token operator">===</span> <span class="token number">4</span> <span class="token operator">&amp;&amp;</span> request<span class="token punctuation">.</span>status <span class="token operator">===</span> <span class="token number">200</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">// ...</span>
+          <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<hr>
+
+<p><a href="https://github.com/phoebeCodeSpace/emic-element/blob/master/src/components/cropper/Cropper.vue" target="_blank" rel="noopener">源代码地址</a></p>
+</div></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">phoebe</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://phoebecodespace.github.io/2018/02/28/vue-croper/">https://phoebecodespace.github.io/2018/02/28/vue-croper/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://phoebecodespace.github.io" target="_blank">phoebe's blog</a>！</span></div></div><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/vue/">vue</a></div><nav id="pagination"><div class="prev-post pull-left"><a href="/2018/04/03/hexo-to-set-up-blog/"><i class="fa fa-chevron-left">  </i><span>用hexo快速搭建博客</span></a></div></nav><div id="gitment-container"></div><script>var gitment = new Gitment({
+  owner: 'phoebeCodeSpace',
+  repo: 'https://github.com/phoebeCodeSpace',
+  oauth: {
+    client_id: 'f1e167c99c113cb54fde',
+    client_secret: 'dfc6a8de063ebe17850d4cb2edb151fda96c3b1b'
+  }
+})
+gitment.render('gitment-container')</script></div></div><footer><div class="layout" id="footer"><div class="copyright">&copy;2018 By phoebe</div><div class="busuanzi"><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><span id="busuanzi_container_page_pv"><i class="fa fa-file-o"></i><span id="busuanzi_value_page_pv"></span><span></span></span></div></div></footer><i class="fa fa-arrow-up" id="go-up" aria-hidden="true"></i><script src="/js/third-party/anime.min.js"></script><script src="/js/third-party/jquery.min.js"></script><script src="/js/third-party/jquery.fancybox.min.js"></script><script src="/js/third-party/velocity.min.js"></script><script src="/js/third-party/velocity.ui.min.js"></script><script src="/js/utils.js?version=1.5.3"></script><script src="/js/fancybox.js?version=1.5.3"></script><script src="/js/sidebar.js?version=1.5.3"></script><script src="/js/copy.js?version=1.5.3"></script><script src="/js/fireworks.js?version=1.5.3"></script><script src="/js/transition.js?version=1.5.3"></script><script src="/js/scroll.js?version=1.5.3"></script><script src="/js/head.js?version=1.5.3"></script><script src="/js/3d-bg.js"></script></body></html>
