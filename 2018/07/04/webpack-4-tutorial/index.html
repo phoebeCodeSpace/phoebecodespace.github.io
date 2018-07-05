@@ -163,9 +163,10 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <p>webpack 并不会主动将你的css代码提取到一个文件，过去我们使用 <code>extract-text-webpack-plugin</code>，在webpack4中我们使用<a href="https://github.com/webpack-contrib/mini-css-extract-plugin" target="_blank" rel="noopener">mini-css-extract-plugin</a>来解决这个问题。</p>
 <p>postcss-loader 用于添加浏览器前缀，相关配置我喜欢在根目录新建 <code>postcss.config.js</code> 配置</p>
 <pre class=" language-bash"><code class="language-bash">    <span class="token function">npm</span> i mini-css-extract-plugin css-loader --save-dev
-    <span class="token function">npm</span> i style-loader postcss-loader postcss-cssnext  --save-dev
+    <span class="token function">npm</span> i style-loader postcss-loader  --save-dev
 </code></pre>
-<pre class=" language-js"><code class="language-js">    <span class="token keyword">const</span> MiniCssExtractPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">"mini-css-extract-plugin"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<pre class=" language-js"><code class="language-js">    <span class="token comment" spellcheck="true">// webpack.config.js</span>
+    <span class="token keyword">const</span> MiniCssExtractPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">"mini-css-extract-plugin"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
     module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">(</span>env<span class="token punctuation">,</span> argv<span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
       <span class="token keyword">const</span> devMode <span class="token operator">=</span> argv<span class="token punctuation">.</span>mode <span class="token operator">!==</span> <span class="token string">'production'</span>
       <span class="token keyword">return</span> <span class="token punctuation">{</span>
@@ -192,10 +193,17 @@ module<span class="token punctuation">.</span>exports <span class="token operato
       <span class="token punctuation">}</span>
     <span class="token punctuation">}</span>
 </code></pre>
+<pre class=" language-js"><code class="language-js"><span class="token comment" spellcheck="true">// postcss.config.js</span>
+    module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">{</span>
+        plugins<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+            autoprefixer<span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+</code></pre>
 <h3 id="复制并压缩html文件-html-webpack-plugin"><a href="#复制并压缩html文件-html-webpack-plugin" class="headerlink" title="复制并压缩html文件 html-webpack-plugin"></a>复制并压缩html文件 <a href="https://webpack.js.org/guides/output-management/#setting-up-htmlwebpackplugin" target="_blank" rel="noopener">html-webpack-plugin</a></h3><pre class=" language-bash"><code class="language-bash">    <span class="token function">npm</span> i html-webpack-plugin html-loader --save-dev
 </code></pre>
-<pre class=" language-js"><code class="language-js">    <span class="token keyword">const</span> HtmlWebPackPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">"html-webpack-plugin"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
+<pre class=" language-js"><code class="language-js">    <span class="token comment" spellcheck="true">// webpack.config.js</span>
+    <span class="token keyword">const</span> HtmlWebPackPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">"html-webpack-plugin"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
     module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">{</span>
         module<span class="token punctuation">:</span> <span class="token punctuation">{</span>
             rules<span class="token punctuation">:</span> <span class="token punctuation">[</span>
@@ -248,13 +256,13 @@ module<span class="token punctuation">.</span>exports <span class="token operato
       <span class="token punctuation">}</span>
     <span class="token punctuation">}</span>
 </code></pre>
-<h3 id="development-模式下启动服务器并实时刷新-webpack-dev-server"><a href="#development-模式下启动服务器并实时刷新-webpack-dev-server" class="headerlink" title="development 模式下启动服务器并实时刷新 webpack-dev-server"></a>development 模式下启动服务器并实时刷新 <a href="https://webpack.js.org/guides/development/#using-webpack-dev-server" target="_blank" rel="noopener">webpack-dev-server</a></h3><pre class=" language-bash"><code class="language-bash"><span class="token function">npm</span> i webpack-dev-server --save-dev
+<h3 id="development-模式下启动服务器并实时刷新-webpack-dev-server"><a href="#development-模式下启动服务器并实时刷新-webpack-dev-server" class="headerlink" title="development 模式下启动服务器并实时刷新 webpack-dev-server"></a>development 模式下启动服务器并实时刷新 <a href="https://webpack.js.org/configuration/dev-server" target="_blank" rel="noopener">webpack-dev-server</a></h3><pre class=" language-bash"><code class="language-bash">    <span class="token function">npm</span> i webpack-dev-server --save-dev
 </code></pre>
 <p><code>package.json</code></p>
-<pre class=" language-json"><code class="language-json"><span class="token property">"scripts"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-  <span class="token property">"start"</span><span class="token operator">:</span> <span class="token string">"webpack-dev-server --mode development --open"</span><span class="token punctuation">,</span>
-  <span class="token property">"build"</span><span class="token operator">:</span> <span class="token string">"webpack --mode production"</span>
-<span class="token punctuation">}</span>
+<pre class=" language-json"><code class="language-json">    <span class="token property">"scripts"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"start"</span><span class="token operator">:</span> <span class="token string">"webpack-dev-server --mode development --open"</span><span class="token punctuation">,</span>
+      <span class="token property">"build"</span><span class="token operator">:</span> <span class="token string">"webpack --mode production"</span>
+    <span class="token punctuation">}</span>
 </code></pre>
 <h2 id="使用-webpack-4-建立-react-项目"><a href="#使用-webpack-4-建立-react-项目" class="headerlink" title="使用 webpack 4 建立 react 项目"></a>使用 webpack 4 建立 react 项目</h2><p>现在我们模仿 <a href="https://github.com/facebook/create-react-app" target="_blank" rel="noopener">create-react-app</a> 的结构，自己搭建一个 react 项目：</p>
 <pre class=" language-bash"><code class="language-bash">  ├── public
@@ -273,7 +281,7 @@ module<span class="token punctuation">.</span>exports <span class="token operato
   ├── postcss.config.js
   └── webpack.config.js
 </code></pre>
-<p>在以上的基础，安装react相关模块：</p>
+<p>在以上的基础，再安装react相关模块：</p>
 <pre class=" language-bash"><code class="language-bash">    <span class="token function">npm</span> i react react-dom --save-dev
     <span class="token function">npm</span> i babel-preset-react --save-dev
 </code></pre>
@@ -282,7 +290,7 @@ module<span class="token punctuation">.</span>exports <span class="token operato
       <span class="token property">"presets"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"env"</span><span class="token punctuation">,</span> <span class="token string">"react"</span><span class="token punctuation">]</span>
     <span class="token punctuation">}</span>
 </code></pre>
-<p>配置 <code>webpack.config.js</code> ：</p>
+<p>修改 <code>webpack.config.js</code> ：</p>
 <pre class=" language-js"><code class="language-js">    module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">{</span>
       module<span class="token punctuation">:</span> <span class="token punctuation">{</span>
         rules<span class="token punctuation">:</span> <span class="token punctuation">[</span>
