@@ -1,0 +1,164 @@
+<!DOCTYPE html><html lang="zh-Hans"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="description" content="音频组件开发实践"><meta name="keywords" content="vue audio"><meta name="author" content="phoebe,undefined"><meta name="copyright" content="phoebe"><title>音频组件开发实践 | phoebe's blog</title><link rel="shortcut icon" href="/favicon.ico"><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.3"><link rel="dns-prefetch" href="https://cdn.staticfile.org"><link rel="dns-prefetch" href="https://cdn.bootcss.com"><link rel="dns-prefetch" href="https://creativecommons.org"><link rel="dns-prefetch" href="https://unpkg.com"><link rel="stylesheet" type="text/css" href="https://unpkg.com/gitment@latest/style/default.css"><script src="https://unpkg.com/gitment@latest/dist/gitment.browser.js"></script><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  localSearch: undefined
+} </script><link rel="stylesheet" href="/css/prism.css" type="text/css"></head><body><canvas id="canvas"></canvas><i class="fa fa-arrow-right" id="toggle-sidebar" aria-hidden="true"></i><div id="sidebar"><div class="toggle-sidebar-info text-center"><span data-toggle="切换文章详情">切换站点概览</span><hr></div><div class="sidebar-toc"><div class="sidebar-toc__title">目录</div><div class="sidebar-toc__progress"><span class="progress-notice">你已经读了</span><span class="progress-num">0</span><span class="progress-percentage">%</span><div class="sidebar-toc__progress-bar"></div></div><div class="sidebar-toc__content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#需求："><span class="toc-number">1.</span> <span class="toc-text">需求：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#按需实现"><span class="toc-number">2.</span> <span class="toc-text">按需实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#一个界面可能存在多个播放文件"><span class="toc-number">2.1.</span> <span class="toc-text">一个界面可能存在多个播放文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#暂停其他语音"><span class="toc-number">2.2.</span> <span class="toc-text">暂停其他语音</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#异步获取语音src，音频载入之后播放"><span class="toc-number">2.3.</span> <span class="toc-text">异步获取语音src，音频载入之后播放</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#音频的操作"><span class="toc-number">2.4.</span> <span class="toc-text">音频的操作</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#播放与暂停"><span class="toc-number">2.4.1.</span> <span class="toc-text">播放与暂停</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#停止、进度拖动"><span class="toc-number">2.4.2.</span> <span class="toc-text">停止、进度拖动</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#音频的打断"><span class="toc-number">2.5.</span> <span class="toc-text">音频的打断</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#拓展"><span class="toc-number">3.</span> <span class="toc-text">拓展</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#canplay-与-canplaythrough-辨析"><span class="toc-number">3.1.</span> <span class="toc-text">canplay 与 canplaythrough 辨析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HTMLMediaElement-play-返回-Promise"><span class="toc-number">3.2.</span> <span class="toc-text">HTMLMediaElement.play() 返回 Promise</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#video-412错误"><span class="toc-number">3.3.</span> <span class="toc-text">video 412错误</span></a></li></ol></li></ol></div></div><div class="author-info hide"><div class="author-info__avatar text-center"><img src="/img/avatar.png"></div><div class="author-info__name text-center">phoebe</div><div class="author-info__description text-center"></div><hr><div class="author-info-articles"><a class="author-info-articles__archives article-meta" href="/archives"><span class="pull-left">文章</span><span class="pull-right">10</span></a><a class="author-info-articles__tags article-meta" href="/tags"><span class="pull-left">标签</span><span class="pull-right">9</span></a><a class="author-info-articles__categories article-meta" href="/categories"><span class="pull-left">分类</span><span class="pull-right">1</span></a></div></div></div><div id="content-outer"><div class="plain" id="top-container"><div id="page-header"><span class="pull-left"> <a id="site-name" href="/">phoebe's blog</a></span><i class="fa fa-bars toggle-menu pull-right" aria-hidden="true"></i><span class="pull-right menus"><a class="site-page" href="/">首页</a><a class="site-page" href="/archives">归档</a><a class="site-page" href="/tags">标签</a><a class="site-page" href="/categories">目录</a><a class="site-page" href="/gallery">相册</a></span></div></div><div class="layout" id="content-inner"><article id="post"><div class="plain" id="post-title">音频组件开发实践</div><div id="post-meta"><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2018-09-15</time></div><div id="post-content"><p>最近公司迭代的项目中，新增了音频播放功能，填了不少音频的坑，总结一下：</p>
+<h2 id="需求："><a href="#需求：" class="headerlink" title="需求："></a>需求：</h2><p>交互需求：</p>
+<ol>
+<li>上传：点击按钮上传语音，返回文件id（上传文件的范畴，本文不会阐述）</li>
+<li>播放：点击播放按钮，异步获取语音播放src，音频载入之后播放</li>
+<li>操作：语音支持播放、暂停、停止、进度拖动等操作</li>
+</ol>
+<p>当然还有一些隐性需求：</p>
+<ol>
+<li>一个界面可能存在多个播放文件</li>
+<li>随时播放一个语音，其它语音应当暂停</li>
+<li>播放过程中，用户重新上传新的语音，此时播放应停止</li>
+</ol>
+<p>实现效果如下图所示：（当然，这只是项目用到的一部分，项目中还有其他页面也用到了这个组件，那么就更考验组件的健壮性和可拓展性了。）</p>
+<p><img src="https://github.com/phoebeCodeSpace/blog/blob/master/audio/audio.png?raw=true" alt="音频播放效果"></p>
+<h2 id="按需实现"><a href="#按需实现" class="headerlink" title="按需实现"></a>按需实现</h2><h3 id="一个界面可能存在多个播放文件"><a href="#一个界面可能存在多个播放文件" class="headerlink" title="一个界面可能存在多个播放文件"></a>一个界面可能存在多个播放文件</h3><p>我们对音频的操作，通常是先获取这个音频 DOM Element，通过对它的操作，实现想要达到的效果，如果你只是设定一个<code>audio</code>这样单薄的ref名称，恐怕会有些问题，因此我给每个音频设定了一个唯一的ref名称。</p>
+<pre class=" language-js"><code class="language-js"><span class="token operator">&lt;</span>template<span class="token operator">></span>
+  <span class="token operator">&lt;</span>audio <span class="token punctuation">:</span>src<span class="token operator">=</span><span class="token string">"audioSrc"</span> <span class="token punctuation">:</span>ref<span class="token operator">=</span><span class="token string">'uniqueId'</span> <span class="token punctuation">:</span>data<span class="token operator">-</span>key<span class="token operator">=</span><span class="token string">"uniqueId"</span> hidden<span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>audio<span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>template<span class="token operator">></span>
+<span class="token operator">&lt;</span>script<span class="token operator">></span>
+<span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token punctuation">{</span>
+  data <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">// uniqueId() 是随机生成字符串的方法</span>
+      uniqueId<span class="token punctuation">:</span> <span class="token function">uniqueId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+      audioSrc<span class="token punctuation">:</span> <span class="token string">''</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  computed<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    audioElement <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span>$refs<span class="token punctuation">[</span><span class="token keyword">this</span><span class="token punctuation">.</span>uniqueId<span class="token punctuation">]</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>script<span class="token operator">></span>
+</code></pre>
+<h3 id="暂停其他语音"><a href="#暂停其他语音" class="headerlink" title="暂停其他语音"></a>暂停其他语音</h3><p>注意到上面的代码，我在给 audio 添加属性的时候，多添加了一个 <code>data-key</code>的属性，那就是为了暂停其他语音而使用的，作为我要操作页面其他音频而设置的标识：</p>
+<pre class=" language-js"><code class="language-js"><span class="token comment" spellcheck="true">// 暂停其他语音的方法</span>
+pauseOthers <span class="token punctuation">(</span>except<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">var</span> audios <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">querySelectorAll</span><span class="token punctuation">(</span><span class="token string">'audio'</span><span class="token punctuation">)</span>
+  <span class="token punctuation">;</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">.</span>forEach<span class="token punctuation">.</span><span class="token function">call</span><span class="token punctuation">(</span>audios<span class="token punctuation">,</span> audio <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>audio<span class="token punctuation">.</span>dataset<span class="token punctuation">[</span><span class="token string">'key'</span><span class="token punctuation">]</span> <span class="token operator">!==</span> except<span class="token punctuation">.</span>uniqueId<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      audio<span class="token punctuation">.</span><span class="token function">pause</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+<span class="token comment" spellcheck="true">// 调用的时候</span>
+<span class="token keyword">this</span><span class="token punctuation">.</span>pauseOthers <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span>
+</code></pre>
+<h3 id="异步获取语音src，音频载入之后播放"><a href="#异步获取语音src，音频载入之后播放" class="headerlink" title="异步获取语音src，音频载入之后播放"></a>异步获取语音src，音频载入之后播放</h3><p>我想这就是项目坑点之一，因为音频src并不是上传语音就返回的，上传语音只返回了语音id，我们需要通过id再去异步请求一次，才能获取到src。</p>
+<p>基于这样的前提，播放操作做了两点考虑（单例模式思维）：</p>
+<ul>
+<li>为什么点击播放再获取语音src？虽然也可以进入界面就请求src，但是如果用户不点击播放，就白白浪费了不需要的请求，基于性能的考虑，决定点击播放后再进行请求。</li>
+<li>并不需要每次点击都重新请求一次，只有未获取过src的音频需要重新请求。</li>
+</ul>
+<p>具体实现：</p>
+<ol>
+<li>播放按钮绑定<code>togglePlay()</code>事件</li>
+<li>判断<code>audioSrc</code>是否有值<ul>
+<li>如果有值，直接进行播放，绑定相关事件，暂停其他语音</li>
+<li>如果没有值，设置loading并进行异步请求，将返回结果赋值给<code>audioSrc</code>，监听音频 <code>canplay</code></li>
+</ul>
+</li>
+<li>监听音频 <code>canplay</code> （这边有一个坑点，后面会提到）<br> 在canplay的回调中，loading结束，绑定相关事件，暂停其他语音</li>
+</ol>
+<p>为什么相关事件的绑定放在 <code>canplay</code> 中？ 不然你可能会出现下面的报错：</p>
+<pre class=" language-bash"><code class="language-bash">Uncaught <span class="token punctuation">(</span>in promise<span class="token punctuation">)</span> DOMException: The element has no supported sources.
+</code></pre>
+<p>所以，答应我，基于audio播放的 <strong>事件</strong> 或是 <strong>属性</strong> ，都放在 <code>canplay</code> 的回调之后。</p>
+<p>相关事件包括（本组件中）：</p>
+<ol>
+<li>监听事件 <code>timeupdate</code> : 控制进度条展示</li>
+<li>监听事件 <code>pause</code> : 监听按钮 播放/暂停 样式</li>
+<li>设置属性 <code>currentTime</code> ： 控制进度拖动或者停止语音</li>
+<li>监听事件 <code>error</code> ： 监听播放错误</li>
+</ol>
+<h3 id="音频的操作"><a href="#音频的操作" class="headerlink" title="音频的操作"></a>音频的操作</h3><h4 id="播放与暂停"><a href="#播放与暂停" class="headerlink" title="播放与暂停"></a>播放与暂停</h4><p>按钮的样式通过设置一个变量作为状态值，<code>paly()</code> 和 <code>pause()</code> 的时候分别改变状态值。</p>
+<p>其它具体逻辑上文描述比较清楚，不再赘述。</p>
+<h4 id="停止、进度拖动"><a href="#停止、进度拖动" class="headerlink" title="停止、进度拖动"></a>停止、进度拖动</h4><ul>
+<li>停止：暂停音频，并将<code>currentTime</code>设置为0</li>
+<li>进度拖动：根据拖动位置计算<code>currentTime</code>值，并设置<code>currentTime</code></li>
+</ul>
+<p>两个操作都涉及到了<code>currentTime</code>的设置，我们在这里遇到了两个坑：</p>
+<ol>
+<li><p>设置currentTime无效<br> 查询资料后发现是后端的锅，具体解决办法链接在这里：<a href="https://segmentfault.com/q/1010000002908474" target="_blank" rel="noopener">HTML5 audio ,在chrome中设置currentTime无效</a></p>
+</li>
+<li><p>设置currentTime继续播放</p>
+<p> 一开始仍然以为是后端的锅，因为当我静态设置一个 audioSrc 的时候，是没有问题的，但是当我动态设置，就会出现这样的问题：无论我是播放状态还是暂停状态，设置到相对应的<code>currentTime</code>都会继续播放。</p>
+<p> 通过排查，发现当我设置<code>currentTime</code>会再次触发一次 <code>canplay</code>事件， <code>canplay</code> 的回调是绑定播放的相关操作，因此会继续播放。</p>
+<p> 解决办法，温习了一遍<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/EventTarget/addEventListener" target="_blank" rel="noopener">addEventListener</a>的语法，绑定<code>canplay</code>事件最多只调用一次。</p>
+<pre class=" language-js"><code class="language-js"> <span class="token keyword">this</span><span class="token punctuation">.</span>audioElement<span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">'canplay'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+       <span class="token comment" spellcheck="true">// ...相关操作</span>
+ <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+   once<span class="token punctuation">:</span> <span class="token boolean">true</span>
+ <span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
+</li>
+</ol>
+<h3 id="音频的打断"><a href="#音频的打断" class="headerlink" title="音频的打断"></a>音频的打断</h3><p>音频的打断包括两种情况：</p>
+<ol>
+<li>组件 <code>destroyed</code></li>
+<li>重新上传新的语音</li>
+</ol>
+<p>第一种情况，解绑相关事件，释放内存。</p>
+<p>第二种情况，具体描述一下：</p>
+<p>当用户重新上传新的语音，不论此时语音暂停还是播放状态，都应该停止。</p>
+<p>我们通过 <code>watch</code> 监听 id (上传返回来的音频id)，当id变化的时候，将 <code>audioSrc</code> 清空，以免播放旧的音频内容。</p>
+<p>然而，仅仅这样是不够的，如果监听 <code>error</code> 事件，就会发现报错，解决的办法还是解绑相关事件，即，我们在 <code>canplay</code> 回调中的绑定的相关事件，让audio恢复初始状态，等到下一次播放的时候，需要重新请求新的src，回到上面播放的部分。</p>
+<h2 id="拓展"><a href="#拓展" class="headerlink" title="拓展"></a>拓展</h2><p>在解决问题的过程中，也查询到了一些实用的知识点，虽然在应用中没有运用到，但是这些知识点看起来似乎挺有用的，为了下次遇到其他坑能快速找到解决办法，先把这些知识点记录下来。</p>
+<h3 id="canplay-与-canplaythrough-辨析"><a href="#canplay-与-canplaythrough-辨析" class="headerlink" title="canplay 与 canplaythrough 辨析"></a><code>canplay</code> 与 <code>canplaythrough</code> 辨析</h3><ul>
+<li>当浏览器能够开始播放指定的音频/视频时，会发生 <code>canplay</code> 事件。</li>
+<li>当浏览器预计能够在不停下来进行缓冲的情况下持续播放指定的音频/视频时，会发生 <code>canplaythrough</code> 事件。</li>
+<li>了解其他<a href="https://developer.mozilla.org/zh-CN/docs/Web/Guide/Events/Media_events" target="_blank" rel="noopener">媒体相关事件</a></li>
+</ul>
+<h3 id="HTMLMediaElement-play-返回-Promise"><a href="#HTMLMediaElement-play-返回-Promise" class="headerlink" title="HTMLMediaElement.play() 返回 Promise"></a><code>HTMLMediaElement.play()</code> 返回 Promise</h3><p><code>&lt;video&gt;</code>或 <code>&lt;audio&gt;</code> 的 <code>play()</code>返回一个 <code>Promise</code>，如果播放成功，Promise状态变成<code>fulfilled</code>，如果播放失败，状态变为<code>rejected</code>并提供错误信息。</p>
+<pre class=" language-js"><code class="language-js"><span class="token keyword">var</span> playPromise <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'video'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">play</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">// In browsers that don’t yet support this functionality,</span>
+<span class="token comment" spellcheck="true">// playPromise won’t be defined.</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span>playPromise <span class="token operator">!==</span> undefined<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  playPromise<span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// Automatic playback started!</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token keyword">catch</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span>error<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// Automatic playback failed.</span>
+    <span class="token comment" spellcheck="true">// Show a UI element to let the user manually start playback.</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h3 id="video-412错误"><a href="#video-412错误" class="headerlink" title="video 412错误"></a>video 412错误</h3><blockquote>
+<p>412 一般是因为服务器的 If-Unmodified-Since 或 If-None-Match 未实现</p>
+</blockquote>
+<pre class=" language-js"><code class="language-js"><span class="token comment" spellcheck="true">// 解决办法</span>
+media<span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">'error'</span><span class="token punctuation">,</span> <span class="token keyword">function</span> <span class="token punctuation">(</span>e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+   <span class="token keyword">var</span> date <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Date</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token keyword">var</span> milliSecs <span class="token operator">=</span> date<span class="token punctuation">.</span><span class="token function">getMilliseconds</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token keyword">var</span> curr_src <span class="token operator">=</span> <span class="token function">$</span><span class="token punctuation">(</span>media<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">attr</span><span class="token punctuation">(</span><span class="token string">'src'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token keyword">var</span> curr_src_arr <span class="token operator">=</span> curr_src<span class="token punctuation">.</span><span class="token function">split</span><span class="token punctuation">(</span><span class="token string">"?"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token keyword">var</span> new_src <span class="token operator">=</span> curr_src_arr<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token operator">+</span><span class="token string">"?t="</span><span class="token operator">+</span>milliSecs<span class="token punctuation">;</span>
+
+   <span class="token function">$</span><span class="token punctuation">(</span>media<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">attr</span><span class="token punctuation">(</span><span class="token string">'src'</span><span class="token punctuation">,</span>new_src<span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token function">$</span><span class="token punctuation">(</span>media<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">find</span><span class="token punctuation">(</span><span class="token string">'source'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">attr</span><span class="token punctuation">(</span><span class="token string">'src'</span><span class="token punctuation">,</span>new_src<span class="token punctuation">)</span><span class="token punctuation">;</span>
+   media<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">load</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>暂时完。</p>
+<p>后续如果测试妹妹发现了什么bug，我会继续填坑记录滴。</p>
+</div></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">phoebe</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://phoebecodespace.github.io/2018/09/15/vue-audio/">https://phoebecodespace.github.io/2018/09/15/vue-audio/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://phoebecodespace.github.io" target="_blank">phoebe's blog</a>！</span></div></div><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/vue-audio/">vue audio</a></div><nav id="pagination"><div class="next-post pull-right"><a href="/2018/09/10/javascript-OOP/"><span>javascript 面向对象编程</span><i class="fa fa-chevron-right"></i></a></div></nav><div id="gitment-container"></div><script>var gitment = new Gitment({
+  owner: 'phoebeCodeSpace',
+  repo: 'https://github.com/phoebeCodeSpace',
+  oauth: {
+    client_id: 'f1e167c99c113cb54fde',
+    client_secret: 'dfc6a8de063ebe17850d4cb2edb151fda96c3b1b'
+  }
+})
+gitment.render('gitment-container')</script></div></div><footer><div class="layout" id="footer"><div class="copyright">&copy;2018 By phoebe</div><div class="busuanzi"><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><span id="busuanzi_container_page_pv"><i class="fa fa-file-o"></i><span id="busuanzi_value_page_pv"></span><span></span></span></div></div></footer><i class="fa fa-arrow-up" id="go-up" aria-hidden="true"></i><script src="/js/third-party/anime.min.js"></script><script src="/js/third-party/jquery.min.js"></script><script src="/js/third-party/jquery.fancybox.min.js"></script><script src="/js/third-party/velocity.min.js"></script><script src="/js/third-party/velocity.ui.min.js"></script><script src="/js/utils.js?version=1.5.3"></script><script src="/js/fancybox.js?version=1.5.3"></script><script src="/js/sidebar.js?version=1.5.3"></script><script src="/js/copy.js?version=1.5.3"></script><script src="/js/fireworks.js?version=1.5.3"></script><script src="/js/transition.js?version=1.5.3"></script><script src="/js/scroll.js?version=1.5.3"></script><script src="/js/head.js?version=1.5.3"></script><script src="/js/3d-bg.js"></script></body></html>
