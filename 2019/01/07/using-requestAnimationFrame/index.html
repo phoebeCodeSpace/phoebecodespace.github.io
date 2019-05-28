@@ -1,0 +1,93 @@
+<!DOCTYPE html><html lang="zh-Hans"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="description" content="using-requestAnimationFrame"><meta name="keywords" content=""><meta name="author" content="phoebe,undefined"><meta name="copyright" content="phoebe"><title>using-requestAnimationFrame | phoebe's blog</title><link rel="shortcut icon" href="/favicon.ico"><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.3"><link rel="dns-prefetch" href="https://cdn.staticfile.org"><link rel="dns-prefetch" href="https://cdn.bootcss.com"><link rel="dns-prefetch" href="https://creativecommons.org"><link rel="dns-prefetch" href="https://unpkg.com"><link rel="stylesheet" type="text/css" href="https://unpkg.com/gitment@latest/style/default.css"><script src="https://unpkg.com/gitment@latest/dist/gitment.browser.js"></script><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  localSearch: undefined
+} </script><link rel="stylesheet" href="/css/prism.css" type="text/css"></head><body><canvas id="canvas"></canvas><i class="fa fa-arrow-right" id="toggle-sidebar" aria-hidden="true"></i><div id="sidebar"><div class="toggle-sidebar-info text-center"><span data-toggle="切换文章详情">切换站点概览</span><hr></div><div class="sidebar-toc"><div class="sidebar-toc__title">目录</div><div class="sidebar-toc__progress"><span class="progress-notice">你已经读了</span><span class="progress-num">0</span><span class="progress-percentage">%</span><div class="sidebar-toc__progress-bar"></div></div><div class="sidebar-toc__content"></div></div><div class="author-info hide"><div class="author-info__avatar text-center"><img src="/img/avatar.png"></div><div class="author-info__name text-center">phoebe</div><div class="author-info__description text-center"></div><hr><div class="author-info-articles"><a class="author-info-articles__archives article-meta" href="/archives"><span class="pull-left">文章</span><span class="pull-right">12</span></a><a class="author-info-articles__tags article-meta" href="/tags"><span class="pull-left">标签</span><span class="pull-right">10</span></a><a class="author-info-articles__categories article-meta" href="/categories"><span class="pull-left">分类</span><span class="pull-right">1</span></a></div></div></div><div id="content-outer"><div class="plain" id="top-container"><div id="page-header"><span class="pull-left"> <a id="site-name" href="/">phoebe's blog</a></span><i class="fa fa-bars toggle-menu pull-right" aria-hidden="true"></i><span class="pull-right menus"><a class="site-page" href="/">首页</a><a class="site-page" href="/archives">归档</a><a class="site-page" href="/tags">标签</a><a class="site-page" href="/categories">目录</a><a class="site-page" href="/gallery">相册</a></span></div></div><div class="layout" id="content-inner"><article id="post"><div class="plain" id="post-title">using-requestAnimationFrame</div><div id="post-meta"><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2019-01-07</time></div><div id="post-content"><ol>
+<li><p>实现数字从0增长，每帧增长1的速度，直到100</p>
+<pre class=" language-js"><code class="language-js"> <span class="token keyword">let</span> startValue <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+ <span class="token keyword">let</span> endValue <span class="token operator">=</span> <span class="token number">100</span>
+ <span class="token keyword">let</span> request <span class="token operator">=</span> <span class="token keyword">null</span>
+ <span class="token keyword">function</span> animate <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+   startValue <span class="token operator">+</span><span class="token operator">=</span> <span class="token number">1</span>
+   console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>startValue<span class="token punctuation">)</span>
+   <span class="token keyword">if</span> <span class="token punctuation">(</span>startValue <span class="token operator">>=</span> endValue<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+     <span class="token function">cancelAnimationFrame</span><span class="token punctuation">(</span>request<span class="token punctuation">)</span>
+   <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+     request <span class="token operator">=</span> <span class="token function">requestAnimationFrame</span><span class="token punctuation">(</span>animate<span class="token punctuation">)</span>
+   <span class="token punctuation">}</span>
+ <span class="token punctuation">}</span>
+</code></pre>
+</li>
+<li><p>实现数字从0增长，匀速在2s内增加到100 （每秒50）</p>
+<pre class=" language-js"><code class="language-js"> <span class="token keyword">let</span> startValue <span class="token operator">=</span> <span class="token number">0</span>
+ <span class="token keyword">let</span> endValue <span class="token operator">=</span> <span class="token number">100</span>
+ <span class="token keyword">let</span> request <span class="token operator">=</span> <span class="token keyword">null</span>
+ <span class="token keyword">let</span> starttime <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Date</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+ <span class="token keyword">const</span> duration <span class="token operator">=</span> <span class="token number">2000</span>
+ <span class="token keyword">function</span> animate <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+   <span class="token keyword">var</span> timestamp <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Date</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+   <span class="token keyword">var</span> runtime <span class="token operator">=</span> timestamp <span class="token operator">-</span> starttime
+   <span class="token keyword">var</span> progress <span class="token operator">=</span> runtime <span class="token operator">/</span> duration
+   progress <span class="token operator">=</span> Math<span class="token punctuation">.</span><span class="token function">min</span><span class="token punctuation">(</span>progress<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span>
+   startValue <span class="token operator">=</span> <span class="token punctuation">(</span>endValue <span class="token operator">*</span> progress<span class="token punctuation">)</span>
+   console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>startValue<span class="token punctuation">)</span>
+   <span class="token keyword">if</span> <span class="token punctuation">(</span>runtime <span class="token operator">&lt;</span> duration<span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token comment" spellcheck="true">// if duration not met yet</span>
+     <span class="token function">requestAnimationFrame</span><span class="token punctuation">(</span>animate<span class="token punctuation">)</span>
+   <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+     <span class="token function">cancelAnimationFrame</span><span class="token punctuation">(</span>request<span class="token punctuation">)</span>
+   <span class="token punctuation">}</span>
+ <span class="token punctuation">}</span>
+ <span class="token function">requestAnimationFrame</span><span class="token punctuation">(</span>animate<span class="token punctuation">)</span>
+</code></pre>
+</li>
+<li><p>实现数字从0增长，按一定函数在2s内增加到100</p>
+</li>
+</ol>
+<!-- https://github.com/tweenjs/tween.js/blob/master/src/Tween.js#L456 -->
+<!-- http://tweenjs.github.io/tween.js/examples/03_graphs.html -->
+<pre><code>```js
+const duration = 2000
+let startValue = 0
+let request = null
+let starttime = new Date().getTime()
+let endValue = 100
+// cancelAnimationFrame(request)
+const animate = () =&gt; {
+  request = window.requestAnimationFrame(animate)
+  draw()
+}
+const draw = (timestamp = new Date().getTime()) =&gt; {
+  const Linear = k =&gt; k
+  const QuadraticIn = k =&gt; k * k
+  const QuadraticOut = k =&gt; k * (2 - k)
+  const CubicInOut = k =&gt; {
+    if ((k *= 2) &lt; 1) {
+      return 0.5 * k * k * k
+    }
+    return 0.5 * ((k -= 2) * k * k + 2)
+  }
+  var runtime = timestamp - starttime
+  var progress = runtime / duration
+  progress = Math.min(progress, 1)
+  startValue = CubicInOut(progress) * endValue
+  console.log(startValue)
+  if (startValue &gt;= endValue) {
+    cancelAnimationFrame(request)
+  }
+}
+animate()
+```
+</code></pre></div></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">phoebe</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://phoebecodespace.github.io/2019/01/07/using-requestAnimationFrame/">https://phoebecodespace.github.io/2019/01/07/using-requestAnimationFrame/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://phoebecodespace.github.io" target="_blank">phoebe's blog</a>！</span></div></div><div class="post-meta__tag-list"></div><nav id="pagination"><div class="prev-post pull-left"><a href="/2019/05/22/PHP-RBAC/"><i class="fa fa-chevron-left">  </i><span>PHP项目实践 RBAC权限管理</span></a></div><div class="next-post pull-right"><a href="/2018/09/15/vue-audio/"><span>音频组件开发实践</span><i class="fa fa-chevron-right"></i></a></div></nav><div id="gitment-container"></div><script>var gitment = new Gitment({
+  owner: 'phoebeCodeSpace',
+  repo: 'https://github.com/phoebeCodeSpace',
+  oauth: {
+    client_id: 'f1e167c99c113cb54fde',
+    client_secret: 'dfc6a8de063ebe17850d4cb2edb151fda96c3b1b'
+  }
+})
+gitment.render('gitment-container')</script></div></div><footer><div class="layout" id="footer"><div class="copyright">&copy;2018 - 2019 By phoebe</div><div class="busuanzi"><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><span id="busuanzi_container_page_pv"><i class="fa fa-file-o"></i><span id="busuanzi_value_page_pv"></span><span></span></span></div></div></footer><i class="fa fa-arrow-up" id="go-up" aria-hidden="true"></i><script src="/js/third-party/anime.min.js"></script><script src="/js/third-party/jquery.min.js"></script><script src="/js/third-party/jquery.fancybox.min.js"></script><script src="/js/third-party/velocity.min.js"></script><script src="/js/third-party/velocity.ui.min.js"></script><script src="/js/utils.js?version=1.5.3"></script><script src="/js/fancybox.js?version=1.5.3"></script><script src="/js/sidebar.js?version=1.5.3"></script><script src="/js/copy.js?version=1.5.3"></script><script src="/js/fireworks.js?version=1.5.3"></script><script src="/js/transition.js?version=1.5.3"></script><script src="/js/scroll.js?version=1.5.3"></script><script src="/js/head.js?version=1.5.3"></script><script src="/js/3d-bg.js"></script></body></html>
