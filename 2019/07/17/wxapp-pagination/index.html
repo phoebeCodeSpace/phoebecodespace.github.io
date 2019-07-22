@@ -1,0 +1,287 @@
+<!DOCTYPE html><html lang="zh-Hans"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="description" content="小程序分页实践：编写可复用分页组件"><meta name="keywords" content="小程序"><meta name="author" content="phoebe,undefined"><meta name="copyright" content="phoebe"><title>小程序分页实践：编写可复用分页组件 | phoebe's blog</title><link rel="shortcut icon" href="/favicon.ico"><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.3"><link rel="dns-prefetch" href="https://cdn.staticfile.org"><link rel="dns-prefetch" href="https://cdn.bootcss.com"><link rel="dns-prefetch" href="https://creativecommons.org"><link rel="dns-prefetch" href="https://unpkg.com"><link rel="stylesheet" type="text/css" href="https://unpkg.com/gitment@latest/style/default.css"><script src="https://unpkg.com/gitment@latest/dist/gitment.browser.js"></script><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  localSearch: undefined
+} </script><link rel="stylesheet" href="/css/prism.css" type="text/css"></head><body><canvas id="canvas"></canvas><i class="fa fa-arrow-right" id="toggle-sidebar" aria-hidden="true"></i><div id="sidebar"><div class="toggle-sidebar-info text-center"><span data-toggle="切换文章详情">切换站点概览</span><hr></div><div class="sidebar-toc"><div class="sidebar-toc__title">目录</div><div class="sidebar-toc__progress"><span class="progress-notice">你已经读了</span><span class="progress-num">0</span><span class="progress-percentage">%</span><div class="sidebar-toc__progress-bar"></div></div><div class="sidebar-toc__content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#项目需求"><span class="toc-number">1.</span> <span class="toc-text">项目需求</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#逻辑实现"><span class="toc-number">2.</span> <span class="toc-text">逻辑实现</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#在组件内监听触发分页事件"><span class="toc-number">2.1.</span> <span class="toc-text">在组件内监听触发分页事件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分页组件的实现逻辑"><span class="toc-number">2.2.</span> <span class="toc-text">分页组件的实现逻辑</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#component"><span class="toc-number">2.2.1.</span> <span class="toc-text">component</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#page"><span class="toc-number">2.2.2.</span> <span class="toc-text">page</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#循环列表item"><span class="toc-number">2.3.</span> <span class="toc-text">循环列表item</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实现切换懒加载"><span class="toc-number">2.4.</span> <span class="toc-text">实现切换懒加载</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#组件的复用"><span class="toc-number">3.</span> <span class="toc-text">组件的复用</span></a></li></ol></div></div><div class="author-info hide"><div class="author-info__avatar text-center"><img src="/img/avatar.png"></div><div class="author-info__name text-center">phoebe</div><div class="author-info__description text-center"></div><hr><div class="author-info-articles"><a class="author-info-articles__archives article-meta" href="/archives"><span class="pull-left">文章</span><span class="pull-right">14</span></a><a class="author-info-articles__tags article-meta" href="/tags"><span class="pull-left">标签</span><span class="pull-right">12</span></a><a class="author-info-articles__categories article-meta" href="/categories"><span class="pull-left">分类</span><span class="pull-right">1</span></a></div></div></div><div id="content-outer"><div class="plain" id="top-container"><div id="page-header"><span class="pull-left"> <a id="site-name" href="/">phoebe's blog</a></span><i class="fa fa-bars toggle-menu pull-right" aria-hidden="true"></i><span class="pull-right menus"><a class="site-page" href="/">首页</a><a class="site-page" href="/archives">归档</a><a class="site-page" href="/tags">标签</a><a class="site-page" href="/categories">目录</a><a class="site-page" href="/gallery">相册</a></span></div></div><div class="layout" id="content-inner"><article id="post"><div class="plain" id="post-title">小程序分页实践：编写可复用分页组件</div><div id="post-meta"><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2019-07-17</time></div><div id="post-content"><p>项目中遇到 tab切换列表，每个tab都需要分页的需求，分页流程具有相似性，于是想将分页封装为组件，方便应用。</p>
+<p>组件的应用已写成一个小demo，效果如下图所示（数据用mock模拟）：</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/gif/112238/1563364003930-6e554c4a-22aa-493e-8b3a-b5d6cf443277.gif#align=left&amp;display=inline&amp;height=736&amp;name=wxapp-pagination.gif&amp;originHeight=736&amp;originWidth=1017&amp;size=7680497&amp;status=done&amp;width=1017" alt="wxapp-pagination.gif"></p>
+<p>源码可以查看：<a href="https://github.com/phoebeCodeSpace/wxapp-pagination" target="_blank" rel="noopener">wxapp-pagination</a></p>
+<h1 id="项目需求"><a href="#项目需求" class="headerlink" title="项目需求"></a>项目需求</h1><p><strong>具体项目需求：</strong></p>
+<ul>
+<li>查看自己相关的会议（页面命名为 meetings）</li>
+<li>tab切换，分为：<ul>
+<li>“我的会议”（我参加的会议，后面会以 “join” 为 key区分）</li>
+<li>“我的预约”（我预约的会议，后面会以 “book” 为 key区分）</li>
+</ul>
+</li>
+<li>一次加载10条（size=10），拉到底部后，加载下一页（page = page +1）</li>
+</ul>
+<p>当然，作为前端，要考虑<strong>性能方面的需求</strong>：</p>
+<ul>
+<li>首次只加载默认tab页的首页，其他tab等到点击到对应tab才开始加载。</li>
+<li>回到已加载过的tab页，保留原数据不重新加载。</li>
+</ul>
+<p>所以原型图大概就长这样：<br><img src="https://cdn.nlark.com/yuque/0/2019/png/112238/1563273465715-5e5b037c-58bf-4923-b2e1-921b7dda2003.png#align=left&amp;display=inline&amp;height=282&amp;name=image.png&amp;originHeight=376&amp;originWidth=518&amp;size=15781&amp;status=done&amp;width=389" alt="image.png"></p>
+<h1 id="逻辑实现"><a href="#逻辑实现" class="headerlink" title="逻辑实现"></a>逻辑实现</h1><p>与分页逻辑相关的项目结构如下：</p>
+<pre class=" language-bash"><code class="language-bash">├── components
+│        ├── meeting-item      <span class="token comment" spellcheck="true"># 列表item</span>
+│        └── pagination            <span class="token comment" spellcheck="true"># 分页组件</span>
+├── model
+│   └── user.js                    <span class="token comment" spellcheck="true"># 我的相关 model</span>
+└── pages
+│       └── user                        <span class="token comment" spellcheck="true"># 我的相关页面</span>
+│       ├── meetings        <span class="token comment" spellcheck="true"># 我的会议（就是tab要分页的页面啦）</span>
+│       └── <span class="token punctuation">..</span>.
+│
+└── vant-weapp
+</code></pre>
+<p>还是用图理一下他们之间的关系吧：</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/112238/1563274743561-4691ca01-d4f1-49cb-a3ff-bb97440b63dd.png#align=left&amp;display=inline&amp;height=236&amp;name=image.png&amp;originHeight=311&amp;originWidth=985&amp;size=45530&amp;status=done&amp;width=746" alt="image.png"></p>
+<h2 id="在组件内监听触发分页事件"><a href="#在组件内监听触发分页事件" class="headerlink" title="在组件内监听触发分页事件"></a>在组件内监听触发分页事件</h2><p>触发分页的事件是滚动到页面的底部，小程序中，触发该事件是Page页面的<a href="https://developers.weixin.qq.com/miniprogram/dev/reference/api/Page.html#onReachBottom" target="_blank" rel="noopener"><code>onReachBottom</code></a>事件，但是这个事件只能在Page中触发，所以要将这个触发时机传递给pagination组件。</p>
+<p>解决思路是：组件 pagination 内，设置<code>key</code>属性，每当<code>onReachBottom</code>事件触发之后，设置组件属性 <code>key</code>  为一个随机字符串，当组件 pagination 监听到<code>key</code>的变化的时候，做出分页操作。</p>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token comment" spellcheck="true">// components/pagination/index.js</span>
+<span class="token function">Component</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+  properties<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    key<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+      type<span class="token punctuation">:</span> String<span class="token punctuation">,</span>
+      observer<span class="token punctuation">:</span> <span class="token string">'_loadMoreData'</span>  <span class="token comment" spellcheck="true">// _loadMoreData 为分页操作</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
+<pre class=" language-html"><code class="language-html"><span class="token comment" spellcheck="true">&lt;!-- pages/user/meetings/index.wxml --></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tabs</span> <span class="token attr-name">active</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>{{currentTab}}<span class="token punctuation">"</span></span> <span class="token attr-name"><span class="token namespace">bind:</span>change</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>onChange<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tab</span> <span class="token attr-name">title</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>我的会议<span class="token punctuation">"</span></span> <span class="token attr-name">data-key</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>{{type[<span class="token punctuation">'</span>JOIN<span class="token punctuation">'</span>]}}<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>view</span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>meeting-list<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+          <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>pagination</span> 
+            <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>JOIN<span class="token punctuation">"</span></span>
+            <span class="token attr-name">key</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>{{joinKey}}<span class="token punctuation">"</span></span> 
+          <span class="token punctuation">></span></span>
+          <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>pagination</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>view</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>tab</span><span class="token punctuation">></span></span>
+
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tab</span> <span class="token attr-name">title</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>我的预约<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>view</span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>meeting-list<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>pagination</span> 
+          <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>BOOK<span class="token punctuation">"</span></span>
+          <span class="token attr-name">key</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>{{bookKey}}<span class="token punctuation">"</span></span>
+        <span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>pagination</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>view</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>tab</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>tabs</span><span class="token punctuation">></span></span>
+</code></pre>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token function">Page</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+  <span class="token function">onReachBottom</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">const</span> key <span class="token operator">=</span> scene<span class="token punctuation">[</span><span class="token operator">+</span><span class="token keyword">this</span><span class="token punctuation">.</span>data<span class="token punctuation">.</span>currentTab<span class="token punctuation">]</span><span class="token punctuation">.</span>key <span class="token comment" spellcheck="true">// 对应tab对应key</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">setData</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+      <span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">:</span> <span class="token function">random</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
+<h2 id="分页组件的实现逻辑"><a href="#分页组件的实现逻辑" class="headerlink" title="分页组件的实现逻辑"></a>分页组件的实现逻辑</h2><p>触发到达底部之后，需要加载数据。但再加载之前，先满足加载的条件：</p>
+<ul>
+<li>上一页还未加载完成（loading = true），不重复加载</li>
+<li>当前页面全部加载完（ended = true），不继续加载</li>
+</ul>
+<p>具体加载流程为：</p>
+<ol>
+<li><strong>page：</strong>触发 onReachBottom 事件，修改 pagination组件 <code>key</code> 值</li>
+<li><strong>component：</strong> <code>key</code>值监听到变化，触发加载事件<code>_loadMoreData</code></li>
+<li><strong>component：</strong><code>_loadMoreData</code>中判断满足条件后，触发加载列表函数 <code>this.triggerEvent(&#39;getList&#39;)</code>，并传入页面参数page 和 size。</li>
+<li><strong>page：</strong>向model层获取数据。</li>
+<li><strong>page：</strong>获取数据后，传递给 pagination组件<code>list</code>和<code>total</code> 值。</li>
+<li><strong>component：</strong><code>list</code> 监听到变化，判断是否加载完成。</li>
+</ol>
+<h3 id="component"><a href="#component" class="headerlink" title="component"></a>component</h3><pre class=" language-javascript"><code class="language-javascript"><span class="token comment" spellcheck="true">// components/pagination/index.js</span>
+<span class="token function">Component</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+  properties<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    name<span class="token punctuation">:</span> String<span class="token punctuation">,</span>
+    key<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+      type<span class="token punctuation">:</span> String<span class="token punctuation">,</span>
+      observer<span class="token punctuation">:</span> <span class="token string">'_loadMoreData'</span>  <span class="token comment" spellcheck="true">// _loadMoreData 为分页操作</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    size<span class="token punctuation">:</span> <span class="token punctuation">{</span>  <span class="token comment" spellcheck="true">// 每次加载条目数</span>
+      type<span class="token punctuation">:</span> Number<span class="token punctuation">,</span>
+      value<span class="token punctuation">:</span> <span class="token number">10</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    total<span class="token punctuation">:</span> Number<span class="token punctuation">,</span> <span class="token comment" spellcheck="true">// 页面总数</span>
+    list<span class="token punctuation">:</span> <span class="token punctuation">{</span>                 <span class="token comment" spellcheck="true">// 已加载条目</span>
+      type<span class="token punctuation">:</span> Array<span class="token punctuation">,</span>
+      observer<span class="token punctuation">:</span> <span class="token string">'_endState'</span>     <span class="token comment" spellcheck="true">// 每次加载完新数据，判断数据是否全部加载完成</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+
+  data<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    page<span class="token punctuation">:</span> <span class="token number">0</span><span class="token punctuation">,</span>                <span class="token comment" spellcheck="true">// 当前第几页</span>
+    loading<span class="token punctuation">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span> <span class="token comment" spellcheck="true">// 是否正在加载</span>
+    ended<span class="token punctuation">:</span> <span class="token boolean">false</span>    <span class="token comment" spellcheck="true">// 数据是否已全部加载完成</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+
+  methods<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    <span class="token function">_loadMoreData</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+      <span class="token keyword">const</span> <span class="token punctuation">{</span> loading<span class="token punctuation">,</span> ended<span class="token punctuation">,</span> size <span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>data
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>loading<span class="token punctuation">)</span> <span class="token keyword">return</span>  <span class="token comment" spellcheck="true">// 上一页还未加载完成，不加载</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>ended<span class="token punctuation">)</span> <span class="token keyword">return</span>    <span class="token comment" spellcheck="true">// 当前页面全部加载完，不加载</span>
+      <span class="token keyword">const</span> page <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>data<span class="token punctuation">.</span>page <span class="token operator">+</span> <span class="token number">1</span>
+
+      <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">setData</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+        loading<span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>  <span class="token comment" spellcheck="true">// 开始加载新页面loading设置为true</span>
+        page
+      <span class="token punctuation">}</span><span class="token punctuation">)</span>
+      <span class="token comment" spellcheck="true">// 触发加载下一页，并传入参数</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">triggerEvent</span><span class="token punctuation">(</span><span class="token string">'getList'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+        page<span class="token punctuation">,</span>
+        size
+      <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token function">_endState</span><span class="token punctuation">(</span>val<span class="token punctuation">,</span> oldVal<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">const</span> <span class="token punctuation">{</span> total<span class="token punctuation">,</span> list <span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>properties
+      <span class="token keyword">let</span> ended <span class="token operator">=</span> <span class="token boolean">false</span>
+      <span class="token comment" spellcheck="true">// 判断数据是否全部加载完成</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>list<span class="token punctuation">.</span>length <span class="token operator">>=</span> total<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        ended <span class="token operator">=</span> <span class="token boolean">true</span>
+      <span class="token punctuation">}</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">setData</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+        loading<span class="token punctuation">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span> <span class="token comment" spellcheck="true">// 当前页面加载完成，loading设置为false</span>
+        ended
+      <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
+<h3 id="page"><a href="#page" class="headerlink" title="page"></a>page</h3><pre class=" language-html"><code class="language-html"><span class="token comment" spellcheck="true">&lt;!-- pages/user/meetings/index.wxml --></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>pagination</span> 
+  <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>BOOK<span class="token punctuation">"</span></span>
+  <span class="token attr-name">key</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>{{bookKey}}<span class="token punctuation">"</span></span>
+  <span class="token attr-name"><span class="token namespace">bind:</span>getList</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>getBookMeetings<span class="token punctuation">"</span></span>
+  <span class="token attr-name">list</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>{{bookMeetings}}<span class="token punctuation">"</span></span>
+  <span class="token attr-name">total</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>{{bookTotal}}<span class="token punctuation">"</span></span>
+<span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>pagination</span><span class="token punctuation">></span></span>
+</code></pre>
+<h2 id="循环列表item"><a href="#循环列表item" class="headerlink" title="循环列表item"></a>循环列表item</h2><p>pagination组件获取了可循环的列表，初始想法是循环slot，但是在slot中却获取不到 item 对象：</p>
+<pre class=" language-html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>view</span> <span class="token attr-name"><span class="token namespace">wx:</span>for</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>{{list}}<span class="token punctuation">"</span></span> <span class="token attr-name"><span class="token namespace">wx:</span>for-item</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>item<span class="token punctuation">"</span></span> <span class="token attr-name"><span class="token namespace">wx:</span>key</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>index<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>slot</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>slot</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>view</span><span class="token punctuation">></span></span>
+</code></pre>
+<p>解决的办法是将每个列表项封装为组件，循环<a href="https://developers.weixin.qq.com/miniprogram/dev/framework/custom-component/generics.html" target="_blank" rel="noopener">抽象节点</a>，这样对其他页面的分页具有可拓展性。</p>
+<p><code>componentGenerics</code> 字段中声明：</p>
+<pre class=" language-json"><code class="language-json">// components/pagination/index.json
+<span class="token punctuation">{</span>
+  <span class="token property">"componentGenerics"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"selectable"</span><span class="token operator">:</span> <span class="token boolean">true</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  // ...
+<span class="token punctuation">}</span>
+</code></pre>
+<p>使用抽象节点：</p>
+<pre class=" language-html"><code class="language-html"><span class="token comment" spellcheck="true">&lt;!-- components/pagination/index.wxml --></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>view</span> <span class="token attr-name"><span class="token namespace">wx:</span>for</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>{{list}}<span class="token punctuation">"</span></span> <span class="token attr-name"><span class="token namespace">wx:</span>for-item</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>item<span class="token punctuation">"</span></span> <span class="token attr-name"><span class="token namespace">wx:</span>key</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>index<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>selectable</span> <span class="token attr-name">item</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>{{item}}<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>selectable</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>view</span><span class="token punctuation">></span></span>
+</code></pre>
+<p>指定“selectable”具体是哪个组件：</p>
+<pre class=" language-html"><code class="language-html"><span class="token comment" spellcheck="true">&lt;!-- pages/user/meetings/index.wxml --></span>
+&lt;pagination 
+  generic:selectable="meeting-item"
+    // ... 其他属性
+>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>pagination</span><span class="token punctuation">></span></span>
+</code></pre>
+<p>对应 json 文件定义对应 <code>usingComponents</code> ：</p>
+<pre class=" language-json"><code class="language-json">// pages/user/meetings/index.json
+<span class="token punctuation">{</span>
+  <span class="token property">"usingComponents"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"pagination"</span><span class="token operator">:</span><span class="token string">"/components/pagination/index"</span><span class="token punctuation">,</span>
+    <span class="token property">"meeting-item"</span><span class="token operator">:</span><span class="token string">"/components/meeting-item/index"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>meeting-item 组件接收一个属性 item，这样在 meeting-item 组件中，就可以获取到循环列表的item值，并正常绘制页面。</p>
+<h2 id="实现切换懒加载"><a href="#实现切换懒加载" class="headerlink" title="实现切换懒加载"></a>实现切换懒加载</h2><p>给pagination添加<code>initImmediately</code>属性，当<code>initImmediately</code>为true时，首次加载页面，并用变量 <code>initState</code>标记是否已经初始化页面过。</p>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token comment" spellcheck="true">// components/pagination/index.js</span>
+<span class="token function">Component</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+  properties<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    initImmediately<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+      type<span class="token punctuation">:</span> Boolean<span class="token punctuation">,</span>
+      value<span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+      observer<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span>val<span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>val <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span><span class="token keyword">this</span><span class="token punctuation">.</span>data<span class="token punctuation">.</span>initState<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+          <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">initData</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token comment" spellcheck="true">// ...</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  data<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+     initState<span class="token punctuation">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span> <span class="token comment" spellcheck="true">// 是否已经加载过</span>
+     <span class="token comment" spellcheck="true">// ...</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  lifetimes<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    attached<span class="token punctuation">:</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>data<span class="token punctuation">.</span>initImmediately<span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">initData</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  methods<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    <span class="token function">initData</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+      console<span class="token punctuation">.</span><span class="token function">info</span><span class="token punctuation">(</span><span class="token template-string"><span class="token string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token keyword">this</span><span class="token punctuation">.</span>data<span class="token punctuation">.</span>name<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">:start init data`</span></span><span class="token punctuation">)</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">_loadMoreData</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">setData</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+        initState<span class="token punctuation">:</span> <span class="token boolean">true</span>
+      <span class="token punctuation">}</span><span class="token punctuation">)</span>   
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token comment" spellcheck="true">// ... </span>
+      <span class="token function">_endState</span><span class="token punctuation">(</span>val<span class="token punctuation">,</span> oldVal<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token keyword">this</span><span class="token punctuation">.</span>data<span class="token punctuation">.</span>initState<span class="token punctuation">)</span> <span class="token keyword">return</span> 
+      <span class="token comment" spellcheck="true">// ...</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
+<p>当currentTab为当前类型的时候，<code>initImmediately</code> 设置为 true。</p>
+<pre class=" language-html"><code class="language-html"><span class="token comment" spellcheck="true">&lt;!-- pages/user/meetings/index.wxml --></span>
+&lt;pagination 
+    name="JOIN"
+    init-immediately="{{currentTab==type['JOIN']}}"
+    // ...
+>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>pagination</span><span class="token punctuation">></span></span>
+
+&lt;pagination 
+    name="BOOK"
+    init-immediately="{{currentTab==type['BOOK']}}"
+    // ...
+>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>pagination</span><span class="token punctuation">></span></span>
+</code></pre>
+<h1 id="组件的复用"><a href="#组件的复用" class="headerlink" title="组件的复用"></a>组件的复用</h1><p>完成了以上组件，在对其他分页的页面，可以直接复用。比如，实现一个获取全部用户列表的分页，只需要新增一个user-item的组件，像这样调用：</p>
+<pre class=" language-html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>pagination</span> 
+  <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>USER<span class="token punctuation">"</span></span>
+  <span class="token attr-name">key</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>{{key}}<span class="token punctuation">"</span></span> 
+  <span class="token attr-name"><span class="token namespace">bind:</span>getList</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>getUserList<span class="token punctuation">"</span></span> 
+  <span class="token attr-name">list</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>{{userList}}<span class="token punctuation">"</span></span> 
+  <span class="token attr-name">total</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>{{userTotal}}<span class="token punctuation">"</span></span>
+  <span class="token attr-name"><span class="token namespace">generic:</span>selectable</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>user-item<span class="token punctuation">"</span></span>
+<span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>pagination</span><span class="token punctuation">></span></span>
+</code></pre>
+<p>具体应用可以查看我写的小demo：<a href="https://github.com/phoebeCodeSpace/wxapp-pagination" target="_blank" rel="noopener">wxapp-pagination</a>。</p>
+</div></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">phoebe</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://phoebecodespace.github.io/2019/07/17/wxapp-pagination/">https://phoebecodespace.github.io/2019/07/17/wxapp-pagination/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://phoebecodespace.github.io" target="_blank">phoebe's blog</a>！</span></div></div><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/小程序/">小程序</a></div><nav id="pagination"><div class="next-post pull-right"><a href="/2019/07/08/vue-authory/"><span>基于Vue实现后台系统权限控制</span><i class="fa fa-chevron-right"></i></a></div></nav><div id="gitment-container"></div><script>var gitment = new Gitment({
+  owner: 'phoebeCodeSpace',
+  repo: 'https://github.com/phoebeCodeSpace',
+  oauth: {
+    client_id: 'f1e167c99c113cb54fde',
+    client_secret: 'dfc6a8de063ebe17850d4cb2edb151fda96c3b1b'
+  }
+})
+gitment.render('gitment-container')</script></div></div><footer><div class="layout" id="footer"><div class="copyright">&copy;2018 - 2019 By phoebe</div><div class="busuanzi"><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><span id="busuanzi_container_page_pv"><i class="fa fa-file-o"></i><span id="busuanzi_value_page_pv"></span><span></span></span></div></div></footer><i class="fa fa-arrow-up" id="go-up" aria-hidden="true"></i><script src="/js/third-party/anime.min.js"></script><script src="/js/third-party/jquery.min.js"></script><script src="/js/third-party/jquery.fancybox.min.js"></script><script src="/js/third-party/velocity.min.js"></script><script src="/js/third-party/velocity.ui.min.js"></script><script src="/js/utils.js?version=1.5.3"></script><script src="/js/fancybox.js?version=1.5.3"></script><script src="/js/sidebar.js?version=1.5.3"></script><script src="/js/copy.js?version=1.5.3"></script><script src="/js/fireworks.js?version=1.5.3"></script><script src="/js/transition.js?version=1.5.3"></script><script src="/js/scroll.js?version=1.5.3"></script><script src="/js/head.js?version=1.5.3"></script><script src="/js/3d-bg.js"></script></body></html>

@@ -1,0 +1,346 @@
+<!DOCTYPE html><html lang="zh-Hans"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="description" content="基于Vue实现后台系统权限控制"><meta name="keywords" content="vue 权限管理"><meta name="author" content="phoebe,undefined"><meta name="copyright" content="phoebe"><title>基于Vue实现后台系统权限控制 | phoebe's blog</title><link rel="shortcut icon" href="/favicon.ico"><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.3"><link rel="dns-prefetch" href="https://cdn.staticfile.org"><link rel="dns-prefetch" href="https://cdn.bootcss.com"><link rel="dns-prefetch" href="https://creativecommons.org"><link rel="dns-prefetch" href="https://unpkg.com"><link rel="stylesheet" type="text/css" href="https://unpkg.com/gitment@latest/style/default.css"><script src="https://unpkg.com/gitment@latest/dist/gitment.browser.js"></script><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  localSearch: undefined
+} </script><link rel="stylesheet" href="/css/prism.css" type="text/css"></head><body><canvas id="canvas"></canvas><i class="fa fa-arrow-right" id="toggle-sidebar" aria-hidden="true"></i><div id="sidebar"><div class="toggle-sidebar-info text-center"><span data-toggle="切换文章详情">切换站点概览</span><hr></div><div class="sidebar-toc"><div class="sidebar-toc__title">目录</div><div class="sidebar-toc__progress"><span class="progress-notice">你已经读了</span><span class="progress-num">0</span><span class="progress-percentage">%</span><div class="sidebar-toc__progress-bar"></div></div><div class="sidebar-toc__content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#需求分析"><span class="toc-number">1.</span> <span class="toc-text">需求分析</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#基础需求"><span class="toc-number">1.1.</span> <span class="toc-text">基础需求</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#进阶需求"><span class="toc-number">1.2.</span> <span class="toc-text">进阶需求</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#路由结构"><span class="toc-number">1.3.</span> <span class="toc-text">路由结构</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#流程构思"><span class="toc-number">2.</span> <span class="toc-text">流程构思</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#逻辑实现"><span class="toc-number">3.</span> <span class="toc-text">逻辑实现</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#状态管理部分"><span class="toc-number">3.1.</span> <span class="toc-text">状态管理部分</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#权限管理类"><span class="toc-number">3.2.</span> <span class="toc-text">权限管理类</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#登录页路由守卫"><span class="toc-number">3.2.1.</span> <span class="toc-text">登录页路由守卫</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#企业系统路由守卫"><span class="toc-number">3.2.2.</span> <span class="toc-text">企业系统路由守卫</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#权限检查"><span class="toc-number">3.2.3.</span> <span class="toc-text">权限检查</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#权限指令"><span class="toc-number">3.3.</span> <span class="toc-text">权限指令</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#后记"><span class="toc-number">4.</span> <span class="toc-text">后记</span></a></li></ol></div></div><div class="author-info hide"><div class="author-info__avatar text-center"><img src="/img/avatar.png"></div><div class="author-info__name text-center">phoebe</div><div class="author-info__description text-center"></div><hr><div class="author-info-articles"><a class="author-info-articles__archives article-meta" href="/archives"><span class="pull-left">文章</span><span class="pull-right">14</span></a><a class="author-info-articles__tags article-meta" href="/tags"><span class="pull-left">标签</span><span class="pull-right">12</span></a><a class="author-info-articles__categories article-meta" href="/categories"><span class="pull-left">分类</span><span class="pull-right">1</span></a></div></div></div><div id="content-outer"><div class="plain" id="top-container"><div id="page-header"><span class="pull-left"> <a id="site-name" href="/">phoebe's blog</a></span><i class="fa fa-bars toggle-menu pull-right" aria-hidden="true"></i><span class="pull-right menus"><a class="site-page" href="/">首页</a><a class="site-page" href="/archives">归档</a><a class="site-page" href="/tags">标签</a><a class="site-page" href="/categories">目录</a><a class="site-page" href="/gallery">相册</a></span></div></div><div class="layout" id="content-inner"><article id="post"><div class="plain" id="post-title">基于Vue实现后台系统权限控制</div><div id="post-meta"><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2019-07-08</time></div><div id="post-content"><h1 id="需求分析"><a href="#需求分析" class="headerlink" title="需求分析"></a>需求分析</h1><h2 id="基础需求"><a href="#基础需求" class="headerlink" title="基础需求"></a>基础需求</h2><p>项目的基础需求是：</p>
+<ul>
+<li><strong>系统管理员</strong>拥有最大权限，管理所有企业；</li>
+<li><strong>企业管理员</strong>拥有该企业所有权限，可下放权限给子账户；</li>
+<li><strong>子账户</strong>拥有限制权限，且可被随时更改。</li>
+<li>根据权限列表展示隐藏相对应菜单栏、按钮等。</li>
+</ul>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/112238/1562066869295-00a85ef8-fb26-4e7e-90df-67082c6efbdc.png#align=left&amp;display=inline&amp;height=350&amp;name=image.png&amp;originHeight=700&amp;originWidth=1300&amp;size=81504&amp;status=done&amp;width=650" alt="image.png"></p>
+<p>我们在登录后，将获取到的用户权限保存到本地缓存中，以便每次方便获取权限，判断权限。</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/112238/1562469641952-137d94a0-5616-40ba-bda5-a967d1d23ef9.png#align=left&amp;display=inline&amp;height=194&amp;name=image.png&amp;originHeight=388&amp;originWidth=1628&amp;size=66339&amp;status=done&amp;width=814" alt="image.png"></p>
+<p>但由于“<em>子账户拥有限制权限，且可被随时更改</em>”这条需求，我们的项目变得稍稍棘手一点：</p>
+<ul>
+<li><strong>权限变少</strong>：当用户点击到<strong>原本有权限但修改后没有权限</strong>的相关请求，后端会给出相对应的状态码供前端判断，此时前端可以根据状态码做出相对应的反馈。</li>
+<li><strong>权限变多</strong>：每个请求都是通的，后端无法反馈，前端也无从得知权限什么时候变多了。我们要求用户退出重新登录，获取最新的权限树。</li>
+</ul>
+<h2 id="进阶需求"><a href="#进阶需求" class="headerlink" title="进阶需求"></a>进阶需求</h2><p>然而，我们的用户特别懒，产品也特别惯着他们，他们要求——“界面刷新，就获取最新的权限列表”。</p>
+<p>看来原来的计划得改了，获取到的用户权限保存到vuex的状态管理器store中，刷新的时候，重新异步获取一次权限，再判断权限。</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/112238/1562469665961-7a39bf94-c685-41ec-88a3-604c5f385e90.png#align=left&amp;display=inline&amp;height=295&amp;name=image.png&amp;originHeight=590&amp;originWidth=1954&amp;size=100596&amp;status=done&amp;width=977" alt="image.png"></p>
+<h2 id="路由结构"><a href="#路由结构" class="headerlink" title="路由结构"></a>路由结构</h2><p>根据项目需求，路由结构如下：</p>
+<pre class=" language-javascript"><code class="language-javascript">routes<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">{</span>
+      path<span class="token punctuation">:</span> <span class="token string">'/login'</span><span class="token punctuation">,</span>
+      component<span class="token punctuation">:</span> Login<span class="token punctuation">,</span>
+      name<span class="token punctuation">:</span> <span class="token string">'login'</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span>
+      path<span class="token punctuation">:</span> <span class="token string">'/enterprise'</span><span class="token punctuation">,</span>
+      component<span class="token punctuation">:</span> Enterprise<span class="token punctuation">,</span>
+      name<span class="token punctuation">:</span> <span class="token string">'Enterprise'</span><span class="token punctuation">,</span>
+      children<span class="token punctuation">:</span> <span class="token function">getRouter</span><span class="token punctuation">(</span>routerConfig<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span>
+      path<span class="token punctuation">:</span> <span class="token string">'*'</span><span class="token punctuation">,</span>
+      redirect<span class="token punctuation">:</span> <span class="token punctuation">{</span>name<span class="token punctuation">:</span> <span class="token string">'login'</span><span class="token punctuation">}</span>
+  <span class="token punctuation">]</span>
+</code></pre>
+<p>项目是多页面项目，在同一个域名下访问，系统管理员登录后以<code>/admin</code>为前缀，企业账户登录后以<code>/enterprise</code>为前缀，企业系统做权限控制，只列出企业系统部分路由大纲。</p>
+<h1 id="流程构思"><a href="#流程构思" class="headerlink" title="流程构思"></a>流程构思</h1><p>从输入地址到页面展示，权限控制流程构思如下：</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/112238/1562569013344-f487356c-9b75-45ef-b10b-0be8b1c9c800.png#align=left&amp;display=inline&amp;height=422&amp;name=image.png&amp;originHeight=844&amp;originWidth=2150&amp;size=170623&amp;status=done&amp;width=1075" alt="image.png"></p>
+<h1 id="逻辑实现"><a href="#逻辑实现" class="headerlink" title="逻辑实现"></a>逻辑实现</h1><p>为了将路由与权限控制分离，我将权限管理单独抽出来一个类。</p>
+<p>因此核心逻辑大致可以分为：</p>
+<ul>
+<li>状态管理部分：处理权限树、存储权限</li>
+<li>权限管理类：判断是否登录、判断是否有权限</li>
+<li>权限指令：控制页面的展示</li>
+</ul>
+<h2 id="状态管理部分"><a href="#状态管理部分" class="headerlink" title="状态管理部分"></a>状态管理部分</h2><p>从后端获取的权限树格式大致长这样：</p>
+<pre class=" language-json"><code class="language-json"><span class="token punctuation">{</span>
+    <span class="token property">"data"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+  <span class="token punctuation">{</span>
+      <span class="token property">"title"</span><span class="token operator">:</span> <span class="token string">"A模块"</span><span class="token punctuation">,</span>
+      <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"module_A"</span><span class="token punctuation">,</span>
+      <span class="token property">"children"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+        <span class="token punctuation">{</span>
+          <span class="token property">"title"</span><span class="token operator">:</span> <span class="token string">"A模块-1"</span><span class="token punctuation">,</span>
+          <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"module_A_1"</span><span class="token punctuation">,</span>
+          <span class="token property">"children"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+            <span class="token punctuation">{</span>
+              <span class="token property">"title"</span><span class="token operator">:</span> <span class="token string">"A模块-1-新增"</span><span class="token punctuation">,</span>
+              <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"A_1_add"</span><span class="token punctuation">,</span>
+              <span class="token property">"children"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>            
+            <span class="token punctuation">}</span><span class="token punctuation">,</span>
+            <span class="token punctuation">{</span>
+              <span class="token property">"title"</span><span class="token operator">:</span> <span class="token string">"A模块-1-编辑"</span><span class="token punctuation">,</span>
+              <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"A_1_edit"</span><span class="token punctuation">,</span>
+              <span class="token property">"children"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>            
+            <span class="token punctuation">}</span>
+          <span class="token punctuation">]</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">]</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token punctuation">{</span>
+    <span class="token property">"title"</span><span class="token operator">:</span> <span class="token string">"B模块"</span><span class="token punctuation">,</span>
+    <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"module_B"</span><span class="token punctuation">,</span>
+    <span class="token property">"children"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+      <span class="token punctuation">{</span>
+        <span class="token property">"title"</span><span class="token operator">:</span> <span class="token string">"B模块-删除"</span><span class="token punctuation">,</span>
+        <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"B_del"</span><span class="token punctuation">,</span>
+        <span class="token property">"children"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">]</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>我们需要将权限树扁平化为以下形式，方便判断。<br>这个列表存储为store中的 <code>permissions</code>，后期的判断权限都以它为依据。</p>
+<pre class=" language-json"><code class="language-json"><span class="token punctuation">{</span>
+    <span class="token property">"module_A"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"allow"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token property">"redirect"</span><span class="token operator">:</span> 'module_A_1'
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">"module_A_1"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"allow"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token property">"redirect"</span><span class="token operator">:</span> ''
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">"A_1_add"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"allow"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token property">"redirect"</span><span class="token operator">:</span> ''
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">"A_1_edit"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"allow"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token property">"redirect"</span><span class="token operator">:</span> ''
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">"module_B"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"allow"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token property">"redirect"</span><span class="token operator">:</span> ''
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">"B_del"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"allow"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token property">"redirect"</span><span class="token operator">:</span> ''
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  // ..
+<span class="token punctuation">}</span>
+</code></pre>
+<p>要提一嘴的是，redirect 用于重定向，默认是没有的，但是对于有子层级的路由需要设置跳转。比如A模块下面还有4个子模块，但是用户只拥有A模块下的2个模块 A-1、A-2，redirect 设置为2个模块中的A-1模块。</p>
+<h2 id="权限管理类"><a href="#权限管理类" class="headerlink" title="权限管理类"></a>权限管理类</h2><p>在权限管理之前，在router需要做额外的配置：</p>
+<blockquote>
+<p>一个页面可能被两种权限获取，如编辑页和新增页，因此我们用数组包含权限。</p>
+</blockquote>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token punctuation">{</span>
+    path<span class="token punctuation">:</span> <span class="token string">'module_A'</span><span class="token punctuation">,</span>
+    component<span class="token punctuation">:</span> <span class="token comment" spellcheck="true">/***/</span><span class="token punctuation">,</span>
+    name<span class="token punctuation">:</span> <span class="token string">'module_A'</span><span class="token punctuation">,</span>
+    meta<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+      authority<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">'module_A'</span><span class="token punctuation">]</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    children<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+        <span class="token punctuation">{</span>
+          path<span class="token punctuation">:</span> <span class="token string">'A-1'</span><span class="token punctuation">,</span>
+          component<span class="token punctuation">:</span> <span class="token comment" spellcheck="true">/***/</span><span class="token punctuation">,</span>
+          name<span class="token punctuation">:</span> <span class="token string">'module_A_1'</span><span class="token punctuation">,</span>
+          meta<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+             authority<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">'module_A'</span><span class="token punctuation">]</span>
+          <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span><span class="token punctuation">,</span>
+         <span class="token punctuation">{</span>
+          path<span class="token punctuation">:</span> <span class="token string">'A-1/:id'</span><span class="token punctuation">,</span>  
+          component<span class="token punctuation">:</span> <span class="token comment" spellcheck="true">/***/</span><span class="token punctuation">,</span>
+          name<span class="token punctuation">:</span> <span class="token string">'module_A_1-id'</span><span class="token punctuation">,</span>
+          meta<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+             authority<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">'A_1_add'</span><span class="token punctuation">,</span> <span class="token string">'A_1_edit'</span><span class="token punctuation">]</span> <span class="token comment" spellcheck="true">/** 编辑页的authority **/</span>
+          <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+   <span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>权限管理类大致框架如下：</p>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token keyword">class</span> <span class="token class-name">AuthControl</span> <span class="token punctuation">{</span>
+  constructor <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>permissions <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span> <span class="token comment" spellcheck="true">// 权限列表</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>authMenus <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>  <span class="token comment" spellcheck="true">// 菜单</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment" spellcheck="true">// 登录页</span>
+  routerLogin <span class="token operator">=</span> <span class="token punctuation">{</span>
+    name<span class="token punctuation">:</span> <span class="token string">'login'</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment" spellcheck="true">// 计算有权限的第一个页面</span>
+    <span class="token keyword">get</span> routerHome <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">// ...</span>
+    <span class="token keyword">return</span> <span class="token punctuation">{</span>
+        name<span class="token punctuation">:</span> key
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment" spellcheck="true">// 登录页路由守卫</span>
+  <span class="token keyword">async</span> loginGuard <span class="token punctuation">(</span>to<span class="token punctuation">,</span> <span class="token keyword">from</span><span class="token punctuation">,</span> next<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// ...</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment" spellcheck="true">// 企业系统路由守卫</span>
+  <span class="token keyword">async</span> EnterpriseGuard <span class="token punctuation">(</span>to<span class="token punctuation">,</span> <span class="token keyword">from</span><span class="token punctuation">,</span> next<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+     <span class="token comment" spellcheck="true">// ...</span>
+  <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">// 异步获取权限</span>
+    <span class="token keyword">async</span> getPermissions <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+  <span class="token punctuation">}</span>
+
+    _loginCheck <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+  <span class="token punctuation">}</span>
+
+    _permissionCheck <span class="token punctuation">(</span>to<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>router.js 调用这个类：</p>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token keyword">const</span> control <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">AuthControl</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+router<span class="token punctuation">.</span><span class="token function">beforeEach</span><span class="token punctuation">(</span><span class="token keyword">async</span> <span class="token punctuation">(</span>to<span class="token punctuation">,</span> <span class="token keyword">from</span><span class="token punctuation">,</span> next<span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>to<span class="token punctuation">.</span>matched<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>path <span class="token operator">===</span> <span class="token string">'login'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">await</span> control<span class="token punctuation">.</span><span class="token function">loginGuard</span><span class="token punctuation">(</span>to<span class="token punctuation">,</span> <span class="token keyword">from</span><span class="token punctuation">,</span> next<span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>to<span class="token punctuation">.</span>matched<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>path <span class="token operator">===</span> <span class="token string">'/enterprise'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">await</span> control<span class="token punctuation">.</span><span class="token function">EnterpriseGuard</span><span class="token punctuation">(</span>to<span class="token punctuation">,</span> <span class="token keyword">from</span><span class="token punctuation">,</span> next<span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+  <span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
+<h3 id="登录页路由守卫"><a href="#登录页路由守卫" class="headerlink" title="登录页路由守卫"></a>登录页路由守卫</h3><p>登录的守卫的调用是判断登录页后进行的守卫。</p>
+<p>基本逻辑就是：已登录=&gt;进入登录后的第一个页面；未登录=&gt;调用<code>next()</code>进入。</p>
+<pre class=" language-javascript"><code class="language-javascript">  <span class="token keyword">async</span> loginGuard <span class="token punctuation">(</span>to<span class="token punctuation">,</span> <span class="token keyword">from</span><span class="token punctuation">,</span> next<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">const</span> loginStatus <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">_loginCheck</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>loginStatus<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">await</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">getPermissions</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+      <span class="token function">next</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>routerHome<span class="token punctuation">)</span>
+      <span class="token keyword">return</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+</code></pre>
+<h3 id="企业系统路由守卫"><a href="#企业系统路由守卫" class="headerlink" title="企业系统路由守卫"></a>企业系统路由守卫</h3><p>将登录页守卫与企业系统守卫分开就是因为，企业系统守卫逻辑较复杂，如果所有情况都调用同一个守卫，这边考虑的会比较多，分开会清晰一些。<br>所以企业路由守卫是判断要进入的地址是企业内容相关页面。</p>
+<p>逻辑大致分为3块：</p>
+<ul>
+<li>是否登录</li>
+<li>该页面是否拥有权限</li>
+<li>该页面是否需要重定向</li>
+</ul>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token keyword">async</span> EnterpriseGuard <span class="token punctuation">(</span>to<span class="token punctuation">,</span> <span class="token keyword">from</span><span class="token punctuation">,</span> next<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// 是否登录</span>
+    <span class="token keyword">const</span> loginStatus <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">_loginCheck</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>loginStatus<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">next</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>routerLogin<span class="token punctuation">)</span>
+      <span class="token keyword">return</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">// 该页面是否拥有权限</span>
+    <span class="token keyword">const</span> permissionStatus <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">_permissionCheck</span><span class="token punctuation">(</span>to<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>permissionStatus<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">next</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>routerHome<span class="token punctuation">)</span>
+      <span class="token keyword">return</span>
+    <span class="token punctuation">}</span>
+
+      <span class="token comment" spellcheck="true">// 该页面是否需要重定向</span>
+    <span class="token keyword">const</span> authority <span class="token operator">=</span> to<span class="token punctuation">.</span>meta<span class="token punctuation">.</span>authority<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+    <span class="token keyword">const</span> redirect <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>permissions<span class="token punctuation">[</span>authority<span class="token punctuation">]</span><span class="token punctuation">.</span>redirect
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>redirect<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+        name<span class="token punctuation">:</span> redirect
+      <span class="token punctuation">}</span><span class="token punctuation">)</span>
+      <span class="token keyword">return</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h3 id="权限检查"><a href="#权限检查" class="headerlink" title="权限检查"></a>权限检查</h3><p>对于 <code>_loginCheck</code> 各家方法不太一致，不赘述。</p>
+<p>对于 <code>_permissionCheck</code> ，主要根据前文在路由中的配置判断：</p>
+<pre class=" language-javascript"><code class="language-javascript"> _permissionCheck <span class="token punctuation">(</span>to<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">const</span> <span class="token punctuation">{</span>
+      meta<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        authority <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span> <span class="token operator">=</span> to
+
+    <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">getPermissions</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+      <span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span>permissions <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+        <span class="token keyword">const</span> allow <span class="token operator">=</span> authority<span class="token punctuation">.</span><span class="token function">some</span><span class="token punctuation">(</span>d <span class="token operator">=</span><span class="token operator">></span> permissions<span class="token punctuation">[</span>d<span class="token punctuation">]</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> allow
+      <span class="token punctuation">}</span><span class="token punctuation">)</span>
+      <span class="token punctuation">.</span><span class="token keyword">catch</span><span class="token punctuation">(</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+        console<span class="token punctuation">.</span><span class="token function">info</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token boolean">false</span>
+      <span class="token punctuation">}</span><span class="token punctuation">)</span>
+ <span class="token punctuation">}</span>
+</code></pre>
+<h2 id="权限指令"><a href="#权限指令" class="headerlink" title="权限指令"></a>权限指令</h2><p>对于按钮权限，会有两种可能：</p>
+<ol>
+<li>隐藏不可见 hidden</li>
+<li>禁用不可点 disabled</li>
+</ol>
+<p>我的初步想法是，对于无权限的按钮，设置属性的值 —— <code>disabled</code>、<code>hidden</code>，这样可以不去修改DOM。</p>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token keyword">const</span> permission <span class="token operator">=</span> <span class="token punctuation">{</span>
+  bind <span class="token punctuation">(</span>el<span class="token punctuation">,</span> binding<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">const</span> <span class="token punctuation">{</span> effect <span class="token operator">=</span> <span class="token string">'disabled'</span><span class="token punctuation">,</span> name<span class="token punctuation">:</span> authority <span class="token punctuation">}</span> <span class="token operator">=</span> binding<span class="token punctuation">.</span>value
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>Store<span class="token punctuation">.</span>getters<span class="token punctuation">[</span><span class="token string">'permissions'</span><span class="token punctuation">]</span><span class="token punctuation">[</span>authority<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      el<span class="token punctuation">[</span>effect<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token boolean">true</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">/**
+* hidden 另外需设置样式：
+[hidden] {
+    visibility: hidden;
+    display: none;
+}
+.el-button[hidden] + .el-button {
+    margin-left: 0;
+}
+.el-button[hidden] ~ .el-button {
+    margin-left: 14px;
+}
+*/</span>
+</code></pre>
+<pre class=" language-html"><code class="language-html"> <span class="token comment" spellcheck="true">&lt;!-- 隐藏效果 --></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>el-button</span> <span class="token attr-name">v-permission</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>{name: <span class="token punctuation">'</span>A_1_add<span class="token punctuation">'</span>, effect:<span class="token punctuation">'</span>hidden<span class="token punctuation">'</span>}<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+  新建
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>el-button</span><span class="token punctuation">></span></span>
+
+<span class="token comment" spellcheck="true">&lt;!-- 置灰效果 --></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>el-button</span> <span class="token attr-name">v-permission</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>{name: <span class="token punctuation">'</span>A_1_edit<span class="token punctuation">'</span>, effect:<span class="token punctuation">'</span>disabled<span class="token punctuation">'</span>}<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+  编辑
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>el-button</span><span class="token punctuation">></span></span>
+</code></pre>
+<p>但是还是发现样式会有点影响，比如按钮外部包裹的div设置了padding值的情况，当按钮全部没有的时候，margin值会撑起一段空白。</p>
+<p>无奈，对于隐藏样式，还是采用移除节点的方式：</p>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token keyword">export</span> <span class="token keyword">const</span> permission <span class="token operator">=</span> <span class="token punctuation">{</span>
+  bind <span class="token punctuation">(</span>el<span class="token punctuation">,</span> binding<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">const</span> <span class="token punctuation">{</span> effect <span class="token operator">=</span> <span class="token string">'disabled'</span><span class="token punctuation">,</span> name<span class="token punctuation">:</span> authority <span class="token punctuation">}</span> <span class="token operator">=</span> binding<span class="token punctuation">.</span>value
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>Store<span class="token punctuation">.</span>getters<span class="token punctuation">[</span><span class="token string">'permissions'</span><span class="token punctuation">]</span><span class="token punctuation">[</span>authority<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>effect <span class="token operator">===</span> <span class="token string">'hidden'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        el<span class="token punctuation">.</span>parentNode<span class="token punctuation">.</span><span class="token function">removeChild</span><span class="token punctuation">(</span>el<span class="token punctuation">)</span>
+      <span class="token punctuation">}</span>
+      el<span class="token punctuation">[</span>effect<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token boolean">true</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>事实上，我们的需求并没有结束。</p>
+<p>由于系统管理员拥有最大权限，管理所有企业，他可以在系统管理员平台代理登录并跳转任意多个企业并拥有该企业的所有权限。但由于权限管理类单独抽象出来，处理起来也没有那么难。</p>
+<p>比如<code>_loginCheck</code> 方法，新增对系统管理员登录的兼容，<code>routerHome</code>的计算，进入未代理过的企业则返回系统管理员的主页，等等。</p>
+</div></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">phoebe</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://phoebecodespace.github.io/2019/07/08/vue-authory/">https://phoebecodespace.github.io/2019/07/08/vue-authory/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://phoebecodespace.github.io" target="_blank">phoebe's blog</a>！</span></div></div><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/vue-权限管理/">vue 权限管理</a></div><nav id="pagination"><div class="prev-post pull-left"><a href="/2019/07/17/wxapp-pagination/"><i class="fa fa-chevron-left">  </i><span>小程序分页实践：编写可复用分页组件</span></a></div><div class="next-post pull-right"><a href="/2019/05/22/PHP-RBAC/"><span>PHP项目实践 RBAC权限管理</span><i class="fa fa-chevron-right"></i></a></div></nav><div id="gitment-container"></div><script>var gitment = new Gitment({
+  owner: 'phoebeCodeSpace',
+  repo: 'https://github.com/phoebeCodeSpace',
+  oauth: {
+    client_id: 'f1e167c99c113cb54fde',
+    client_secret: 'dfc6a8de063ebe17850d4cb2edb151fda96c3b1b'
+  }
+})
+gitment.render('gitment-container')</script></div></div><footer><div class="layout" id="footer"><div class="copyright">&copy;2018 - 2019 By phoebe</div><div class="busuanzi"><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><span id="busuanzi_container_page_pv"><i class="fa fa-file-o"></i><span id="busuanzi_value_page_pv"></span><span></span></span></div></div></footer><i class="fa fa-arrow-up" id="go-up" aria-hidden="true"></i><script src="/js/third-party/anime.min.js"></script><script src="/js/third-party/jquery.min.js"></script><script src="/js/third-party/jquery.fancybox.min.js"></script><script src="/js/third-party/velocity.min.js"></script><script src="/js/third-party/velocity.ui.min.js"></script><script src="/js/utils.js?version=1.5.3"></script><script src="/js/fancybox.js?version=1.5.3"></script><script src="/js/sidebar.js?version=1.5.3"></script><script src="/js/copy.js?version=1.5.3"></script><script src="/js/fireworks.js?version=1.5.3"></script><script src="/js/transition.js?version=1.5.3"></script><script src="/js/scroll.js?version=1.5.3"></script><script src="/js/head.js?version=1.5.3"></script><script src="/js/3d-bg.js"></script></body></html>
